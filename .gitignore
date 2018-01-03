@@ -1,0 +1,9 @@
+# VSCode
+.vscode/
+
+# Python
+*.py[cod]
+__pycache__/
+
+# Dev database
+*.sqlite*
