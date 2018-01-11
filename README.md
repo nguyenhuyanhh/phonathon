@@ -43,6 +43,6 @@ This model holds information about a pledge made by a prospect. The fields are a
 | -- | -- | --
 | `id` | Unique numerical id | 
 | `prospect_id` | ID of prospect who made the pledge | `foreign_key`
-| `pledge_amount` | Amount of pledge | `float`
+| `pledge_amount` | Amount of pledge | `decimal`
 | `pledge_fund` | Fund of pledge | `str(50)`
 | `pledge_date` | Date of pledge | `date`
