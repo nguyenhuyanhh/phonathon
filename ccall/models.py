@@ -34,3 +34,15 @@ class Prospect(models.Model):
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.nric)
+
+
+class Pledge(models.Model):
+    """Model for a Pledge."""
+    pledge_amount = models.DecimalField(
+        verbose_name='Pledge amount', decimal_places=2, max_digits=12)
+    pledge_fund = models.CharField(verbose_name='Pledge fund', max_length=50)
+    pledge_date = models.DateField(verbose_name='Pledge date')
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '{} - ${} ({})'.format(self.prospect, self.pledge_amount, self.pledge_fund)
