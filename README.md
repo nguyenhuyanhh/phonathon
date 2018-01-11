@@ -34,3 +34,15 @@ This model holds information about a prospect. The fields are as follows:
 | `education_school` | Education (school graduated from) | `str(50)`
 | `education_degree` | Education (degree obtained) | `str(50)`
 | `education_year` | Education (graduation year) | `int(4)`
+
+#### `Pledge`
+
+This model holds information about a pledge made by a prospect. The fields are as follows:
+
+| Field | Description | Type
+| -- | -- | --
+| `id` | Unique numerical id | 
+| `prospect_id` | ID of prospect who made the pledge | `foreign_key`
+| `pledge_amount` | Amount of pledge | `float`
+| `pledge_fund` | Fund of pledge | `str(50)`
+| `pledge_date` | Date of pledge | `date`
