@@ -1,5 +1,7 @@
 # phonathon
 
+[![Build Status](https://travis-ci.org/nguyenhuyanhh/phonathon.svg?branch=master)](https://travis-ci.org/nguyenhuyanhh/phonathon)
+
 The system aims to provide a modern and free alternative to the current Campuscall system used in Phonathon.
 
 ## Overview
