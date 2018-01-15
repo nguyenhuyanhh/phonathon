@@ -10,7 +10,7 @@ from django.utils import timezone
 
 class Prospect(models.Model):
     """Model for a Prospect."""
-    nric = models.CharField(max_length=15, verbose_name='NRIC')
+    nric = models.CharField(max_length=15, verbose_name='NRIC', unique=True)
     salutation = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
     email = models.EmailField(verbose_name='Email address', blank=True)
