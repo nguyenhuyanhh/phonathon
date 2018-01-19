@@ -6,8 +6,17 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Pledge, Prospect
+from .models import PhonathonUser, Pledge, Prospect
 from .views import home
+
+
+class TestPhonathonUser(TestCase):
+    """Tests for model User."""
+
+    def test_string_representation(self):
+        """Test the string representation."""
+        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
+        self.assertEqual(str(test_model), 'Alex Ang (AlexA)')
 
 
 class TestProspect(TestCase):
