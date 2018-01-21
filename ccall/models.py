@@ -3,14 +3,27 @@
 
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
 
+class PhonathonUser(AbstractUser):
+    """Model for a User."""
+    username = models.CharField(max_length=15, unique=True)
+    name = models.CharField(
+        max_length=50, verbose_name='Full name', blank=False)
+    REQUIRED_FIELDS = ['name', 'email']
+    USERNAME_FIELD = 'username'
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.username)
+
+
 class Prospect(models.Model):
     """Model for a Prospect."""
-    nric = models.CharField(max_length=15, verbose_name='NRIC')
+    nric = models.CharField(max_length=15, verbose_name='NRIC', unique=True)
     salutation = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
     email = models.EmailField(verbose_name='Email address', blank=True)

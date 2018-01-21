@@ -16,6 +16,17 @@ The current focus is on getting a minimum working example for presentation to st
 
 ### Models
 
+#### `Phonathon User`
+
+This model holds information about users of the system. It extends the basic `django.contrib.auth.models.AbstractUser`.
+
+The overrided and additional fields in the model are as follows:
+
+| Field | Description | Type 
+| -- | -- | --
+| `username` | Username | `str(15)`
+| `name` | Full name | `str(50)`
+
 #### `Prospect`
 
 This model holds information about a prospect. The fields are as follows:
