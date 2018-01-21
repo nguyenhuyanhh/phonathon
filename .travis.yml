@@ -2,8 +2,13 @@ language: python
 python:
   - "3.5"
   - "3.6"
+env:
+  - DJANGO_VERSION=1.11.10
+  - DJANGO_VERSION=2.0.2
 install:
+  - echo "$(tail -n +2 requirements.txt)" > requirements.txt
   - pip install -r requirements.txt
+  - pip install Django==$DJANGO_VERSION
 script:
   - python manage.py migrate
   - python manage.py test
