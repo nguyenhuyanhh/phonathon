@@ -27,6 +27,16 @@ def add_groups(apps, schema_editor):
     supervisors, _ = Group.objects.get_or_create(name='Supervisors')
     callers, _ = Group.objects.get_or_create(name='Callers')
 
+    # apply permissions for User
+    add = Permission.objects.get(codename='add_phonathonuser')
+    change = Permission.objects.get(codename='change_phonathonuser')
+    delete = Permission.objects.get(codename='delete_phonathonuser')
+    # only managers and supervisors can change users
+    managers.permissions.add(change)
+    supervisors.permissions.add(change)
+    # only manager can add or delete
+    managers.permissions.add(add, delete)
+
     # apply permissions for Prospect
     add = Permission.objects.get(codename='add_prospect')
     change = Permission.objects.get(codename='change_prospect')
@@ -46,6 +56,16 @@ def add_groups(apps, schema_editor):
     managers.permissions.add(add, change, delete)
 
 
+def create_init_superuser(apps, schema_editor):
+    """Create the initial superuser."""
+    from django.contrib.auth.hashers import make_password
+
+    PhonathonUser = apps.get_model('ccall', 'PhonathonUser')
+    superuser = PhonathonUser(username='admin', password=make_password(
+        'admin'), name='Admin', email='admin@admin.com', is_staff=True, is_superuser=True)
+    superuser.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -56,4 +76,5 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(add_permissions),
         migrations.RunPython(add_groups),
+        migrations.RunPython(create_init_superuser),
     ]
