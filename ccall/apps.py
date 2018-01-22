@@ -10,3 +10,6 @@ class CcallConfig(AppConfig):
     """App configuration for ccall app."""
     name = 'ccall'
     verbose_name = 'Phonathon'
+
+    def ready(self):
+        import ccall.signals
