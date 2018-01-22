@@ -13,13 +13,12 @@ class PhonathonUserAdmin(UserAdmin):
     """Admin interface for model User."""
     list_display = ('username', 'name', 'email', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('name', 'email', 'password')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff',
-                                    'is_superuser', 'groups', 'user_permissions')}),
+        (None, {'fields': ('username', 'name', 'email', 'password')}),
+        ('Permissions', {'fields': ('is_active', 'groups')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')})
     )
     add_fieldsets = (
-        (None, {'fields': ('name', 'email', 'password1', 'password2')}),
+        (None, {'fields': ('username', 'name', 'email', 'password1', 'password2')}),
     )
 
 
