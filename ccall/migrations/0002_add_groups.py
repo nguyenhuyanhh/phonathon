@@ -56,6 +56,16 @@ def add_groups(apps, schema_editor):
     managers.permissions.add(add, change, delete)
 
 
+def create_init_superuser(apps, schema_editor):
+    """Create the initial superuser."""
+    from django.contrib.auth.hashers import make_password
+
+    PhonathonUser = apps.get_model('ccall', 'PhonathonUser')
+    superuser = PhonathonUser(username='admin', password=make_password(
+        'admin'), name='Admin', email='admin@admin.com', is_staff=True, is_superuser=True)
+    superuser.save()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -66,4 +76,5 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(add_permissions),
         migrations.RunPython(add_groups),
+        migrations.RunPython(create_init_superuser),
     ]
