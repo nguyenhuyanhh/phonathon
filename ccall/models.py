@@ -49,11 +49,20 @@ class Prospect(models.Model):
         return '{} ({})'.format(self.name, self.nric)
 
 
+class Fund(models.Model):
+    """Model for a Pledge Fund."""
+    name = models.CharField(verbose_name='Fund name',
+                            max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Pledge(models.Model):
     """Model for a Pledge."""
     pledge_amount = models.DecimalField(
         verbose_name='Pledge amount', decimal_places=2, max_digits=12)
-    pledge_fund = models.CharField(verbose_name='Pledge fund', max_length=50)
+    pledge_fund = models.ForeignKey(Fund, on_delete=models.CASCADE)
     pledge_date = models.DateField(verbose_name='Pledge date')
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
 

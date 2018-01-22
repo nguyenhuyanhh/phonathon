@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import PhonathonUser, Pledge, Prospect
+from .models import Fund, PhonathonUser, Pledge, Prospect
 from .views import home
 
 
@@ -64,6 +64,22 @@ class TestGroups(TestCase):
         add = Permission.objects.get(codename='add_pledge')
         change = Permission.objects.get(codename='change_pledge')
         delete = Permission.objects.get(codename='delete_pledge')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertNotIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
+    def test_permissions_fund(self):
+        """Tests for Fund permission."""
+        add = Permission.objects.get(codename='add_fund')
+        change = Permission.objects.get(codename='change_fund')
+        delete = Permission.objects.get(codename='delete_fund')
 
         self.assertIn(add, self.manager_perms)
         self.assertIn(change, self.manager_perms)
@@ -139,16 +155,26 @@ class TestProspect(TestCase):
         self.assertEqual(str(test_model), 'Alex Ang (S1234567A)')
 
 
+class TestFund(TestCase):
+    """Tests for model Fund."""
+
+    def test_string_representation(self):
+        """Test the string representation."""
+        test_model = Fund(name='NTU Bursaries')
+        self.assertEqual(str(test_model), 'NTU Bursaries')
+
+
 class TestPledge(TestCase):
     """Tests for model Pledge."""
 
     def test_string_representation(self):
         """Test the string representation."""
         test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
+        test_fund = Fund(name='NTU Bursaries')
         test_pledge = Pledge(
-            pledge_amount=50, pledge_fund='Bursaries', prospect=test_prospect)
+            pledge_amount=50, pledge_fund=test_fund, prospect=test_prospect)
         self.assertEqual(str(test_pledge),
-                         'Alex Ang (S1234567A) - $50 (Bursaries)')
+                         'Alex Ang (S1234567A) - $50 (NTU Bursaries)')
 
 
 class TestViews(TestCase):

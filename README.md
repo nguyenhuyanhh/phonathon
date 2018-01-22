@@ -48,6 +48,15 @@ This model holds information about a prospect. The fields are as follows:
 | `education_degree` | Education (degree obtained) | `str(50)`
 | `education_year` | Education (graduation year) | `int(4)`
 
+#### `Fund`
+
+This model holds information about pledge funds. The only field in this model is `name`.
+
+| Field | Description | Type 
+| -- | -- | --
+| `id` | Unique numerical id | 
+| `name` | Fund name | `str(50)`
+
 #### `Pledge`
 
 This model holds information about a pledge made by a prospect. The fields are as follows:
@@ -57,7 +66,7 @@ This model holds information about a pledge made by a prospect. The fields are a
 | `id` | Unique numerical id | 
 | `prospect_id` | ID of prospect who made the pledge | `foreign_key`
 | `pledge_amount` | Amount of pledge | `decimal`
-| `pledge_fund` | Fund of pledge | `str(50)`
+| `fund_id` | Fund of pledge | `foreign_key`
 | `pledge_date` | Date of pledge | `date`
 
 ### Group-based Authentication
@@ -66,6 +75,7 @@ In this project, users are assigned groups (either Managers, Supervisors or Call
 
 | | Managers | Supervisors | Callers
 | -- | -- | -- | --
-| User | CRUD | RU | 
+| User | CRUD | RU | R
 | Prospect | CRUD | RU | RU
+| Fund | CRUD | R | R
 | Pledge | CRUD | R | R
