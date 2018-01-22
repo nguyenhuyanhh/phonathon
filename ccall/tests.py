@@ -111,6 +111,16 @@ class TestStaffStatus(TestCase):
         self.assertFalse(test_model.is_staff)
 
 
+class TestInitialSuperuser(TestCase):
+    """Tests for the initial superuser."""
+
+    def test_initial_superuser(self):
+        """Tests for the initial superuser."""
+        superuser = PhonathonUser.objects.get(username='admin')
+        self.assertTrue(superuser.is_superuser)
+        self.assertTrue(superuser.is_staff)
+
+
 class TestPhonathonUser(TestCase):
     """Tests for model User."""
 
