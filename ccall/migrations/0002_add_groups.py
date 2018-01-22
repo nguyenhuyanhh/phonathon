@@ -55,6 +55,13 @@ def add_groups(apps, schema_editor):
     # only managers can do this
     managers.permissions.add(add, change, delete)
 
+    # apply permissions for Fund
+    add = Permission.objects.get(codename='add_fund')
+    change = Permission.objects.get(codename='change_fund')
+    delete = Permission.objects.get(codename='delete_fund')
+    # only managers can do this
+    managers.permissions.add(add, change, delete)
+
 
 def create_init_superuser(apps, schema_editor):
     """Create the initial superuser."""
