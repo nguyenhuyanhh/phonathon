@@ -27,6 +27,16 @@ def add_groups(apps, schema_editor):
     supervisors, _ = Group.objects.get_or_create(name='Supervisors')
     callers, _ = Group.objects.get_or_create(name='Callers')
 
+    # apply permissions for User
+    add = Permission.objects.get(codename='add_phonathonuser')
+    change = Permission.objects.get(codename='change_phonathonuser')
+    delete = Permission.objects.get(codename='delete_phonathonuser')
+    # only managers and supervisors can change users
+    managers.permissions.add(change)
+    supervisors.permissions.add(change)
+    # only manager can add or delete
+    managers.permissions.add(add, delete)
+
     # apply permissions for Prospect
     add = Permission.objects.get(codename='add_prospect')
     change = Permission.objects.get(codename='change_prospect')
