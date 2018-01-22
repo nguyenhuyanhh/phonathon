@@ -59,3 +59,13 @@ This model holds information about a pledge made by a prospect. The fields are a
 | `pledge_amount` | Amount of pledge | `decimal`
 | `pledge_fund` | Fund of pledge | `str(50)`
 | `pledge_date` | Date of pledge | `date`
+
+### Group-based Authentication
+
+In this project, users are assigned groups (either Managers, Supervisors or Callers) and model permissions are assigned based on groups. The CRUD (Create-Read-Update-Delete) operations matrix is as below:
+
+| | Managers | Supervisors | Callers
+| -- | -- | -- | --
+| User | CRUD | RU | 
+| Prospect | CRUD | RU | RU
+| Pledge | CRUD | R | R
