@@ -63,6 +63,41 @@ class TestGroups(TestCase):
         self.assertNotIn(delete, caller_perms)
 
 
+class TestStaffStatus(TestCase):
+    """Tests for staff status."""
+
+    def test_caller_created(self):
+        """Test staff status for a newly created caller."""
+        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
+        test_model.save()
+        test_model.groups.add(Group.objects.get(name='Callers'))
+        self.assertFalse(test_model.is_staff)
+
+    def test_supervisor_created(self):
+        """Test staff status for a newly created supervisor."""
+        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
+        test_model.save()
+        test_model.groups.add(Group.objects.get(name='Supervisors'))
+        self.assertTrue(test_model.is_staff)
+
+    def test_manager_created(self):
+        """Test staff status for a newly created supervisor."""
+        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
+        test_model.save()
+        test_model.groups.add(Group.objects.get(name='Managers'))
+        self.assertTrue(test_model.is_staff)
+
+    def test_change_status(self):
+        """Test for status change."""
+        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
+        test_model.save()
+        test_model.groups.add(Group.objects.get(name='Managers'))
+        self.assertTrue(test_model.is_staff)
+        test_model.groups.remove(Group.objects.get(name='Managers'))
+        test_model.groups.add(Group.objects.get(name='Callers'))
+        self.assertFalse(test_model.is_staff)
+
+
 class TestPhonathonUser(TestCase):
     """Tests for model User."""
 
