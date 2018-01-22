@@ -14,53 +14,66 @@ from .views import home
 class TestGroups(TestCase):
     """Tests for default groups and permissions."""
 
+    def setUp(self):
+        self.manager_perms = Group.objects.get(
+            name='Managers').permissions.all()
+        self.supervisor_perms = Group.objects.get(
+            name='Supervisors').permissions.all()
+        self.caller_perms = Group.objects.get(name='Callers').permissions.all()
+
     def test_groups(self):
         """Tests for existence of groups."""
         self.assertEqual(len(Group.objects.all()), 3)
-        self.assertEqual(len(Group.objects.filter(name__exact='Managers')), 1)
-        self.assertEqual(
-            len(Group.objects.filter(name__exact='Supervisors')), 1)
-        self.assertEqual(len(Group.objects.filter(name__exact='Callers')), 1)
+        self.assertEqual(len(Group.objects.filter(
+            name__in=['Managers', 'Supervisors', 'Callers'])), 3)
+
+    def test_permissions_user(self):
+        """Tests for User permission."""
+        add = Permission.objects.get(codename='add_phonathonuser')
+        change = Permission.objects.get(codename='change_phonathonuser')
+        delete = Permission.objects.get(codename='delete_phonathonuser')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
 
     def test_permissions_prospect(self):
         """Tests for Prospect permission."""
         add = Permission.objects.get(codename='add_prospect')
         change = Permission.objects.get(codename='change_prospect')
         delete = Permission.objects.get(codename='delete_prospect')
-        manager_perms = Group.objects.get(name='Managers').permissions.all()
-        supervisor_perms = Group.objects.get(
-            name='Supervisors').permissions.all()
-        caller_perms = Group.objects.get(name='Callers').permissions.all()
 
-        self.assertIn(add, manager_perms)
-        self.assertIn(change, manager_perms)
-        self.assertIn(delete, manager_perms)
-        self.assertNotIn(add, supervisor_perms)
-        self.assertIn(change, supervisor_perms)
-        self.assertNotIn(delete, supervisor_perms)
-        self.assertNotIn(add, caller_perms)
-        self.assertIn(change, caller_perms)
-        self.assertNotIn(delete, caller_perms)
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
 
     def test_permissions_pledge(self):
         """Tests for Pledge permission."""
         add = Permission.objects.get(codename='add_pledge')
         change = Permission.objects.get(codename='change_pledge')
         delete = Permission.objects.get(codename='delete_pledge')
-        manager_perms = Group.objects.get(name='Managers').permissions.all()
-        supervisor_perms = Group.objects.get(
-            name='Supervisors').permissions.all()
-        caller_perms = Group.objects.get(name='Callers').permissions.all()
 
-        self.assertIn(add, manager_perms)
-        self.assertIn(change, manager_perms)
-        self.assertIn(delete, manager_perms)
-        self.assertNotIn(add, supervisor_perms)
-        self.assertNotIn(change, supervisor_perms)
-        self.assertNotIn(delete, supervisor_perms)
-        self.assertNotIn(add, caller_perms)
-        self.assertNotIn(change, caller_perms)
-        self.assertNotIn(delete, caller_perms)
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertNotIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
 
 
 class TestStaffStatus(TestCase):
