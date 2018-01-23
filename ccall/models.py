@@ -14,6 +14,8 @@ class PhonathonUser(AbstractUser):
     username = models.CharField(max_length=15, unique=True)
     name = models.CharField(
         max_length=50, verbose_name='Full name', blank=False)
+    date_joined = models.DateField(
+        verbose_name='Date joined', default=timezone.localdate)
     REQUIRED_FIELDS = ['name', 'email']
     USERNAME_FIELD = 'username'
 
