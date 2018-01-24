@@ -22,7 +22,21 @@ class PhonathonUserAdmin(UserAdmin):
     )
 
 
+class ProspectAdmin(admin.ModelAdmin):
+    """Admin interface for model Prospect."""
+    list_display = ('nric', 'name', 'phone_home', 'phone_mobile')
+    fieldsets = (
+        (None, {'fields': ('nric', 'salutation', 'name',
+                           'email', 'phone_home', 'phone_mobile')}),
+        ('Address', {'fields': ('address_1',
+                                'address_2', 'address_3', 'address_postal')}),
+        ('Education', {'fields': ('education_school',
+                                  'education_degree', 'education_year')}),
+    )
+    add_fieldsets = fieldsets
+
+
 admin.site.register(PhonathonUser, PhonathonUserAdmin)
-admin.site.register(Prospect)
+admin.site.register(Prospect, ProspectAdmin)
 admin.site.register(Pledge)
 admin.site.register(Fund)
