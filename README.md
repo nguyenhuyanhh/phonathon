@@ -70,6 +70,17 @@ This model holds information about a pledge made by a prospect. The fields are a
 | `fund_id` | Fund of pledge | `foreign_key`
 | `pledge_date` | Date of pledge | `date`
 
+#### `Pool`
+
+This model holds information about a calling pool. The fields are as follows:
+
+| Field | Description | Type
+| -- | -- | --
+| `id` | Unique numerical id |
+| `name` | Pool name | `str(50)`
+| `prospects` | Prospects in the pool | `set(foreign_key)`
+| `max_attempts` | Maximum number of attempts | `int`
+
 ### Group-based Authentication
 
 In this project, users are assigned groups (either Managers, Supervisors or Callers) and model permissions are assigned based on groups. The CRUD (Create-Read-Update-Delete) operations matrix is as below:
