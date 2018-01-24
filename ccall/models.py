@@ -70,3 +70,16 @@ class Pledge(models.Model):
 
     def __str__(self):
         return '{} - ${} ({})'.format(self.prospect, self.pledge_amount, self.pledge_fund)
+
+
+class Pool(models.Model):
+    """Model for a Pool."""
+    name = models.CharField(max_length=50, verbose_name='Pool name')
+    max_attempts = models.PositiveSmallIntegerField(
+        verbose_name='Maximum number of attempts')
+    prospects = models.ManyToManyField(
+        to=Prospect, related_name='prospect_set',
+        related_query_name='prospects', verbose_name='Prospects', blank=True)
+
+    def __str__(self):
+        return self.name
