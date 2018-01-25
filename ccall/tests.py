@@ -91,6 +91,22 @@ class TestGroups(TestCase):
         self.assertNotIn(change, self.caller_perms)
         self.assertNotIn(delete, self.caller_perms)
 
+    def test_permissions_pool(self):
+        """Tests for Pool permission."""
+        add = Permission.objects.get(codename='add_pool')
+        change = Permission.objects.get(codename='change_pool')
+        delete = Permission.objects.get(codename='delete_pool')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
 
 class TestStaffStatus(TestCase):
     """Tests for staff status."""

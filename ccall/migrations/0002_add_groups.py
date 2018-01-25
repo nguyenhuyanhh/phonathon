@@ -62,6 +62,15 @@ def add_groups(apps, schema_editor):
     # only managers can do this
     managers.permissions.add(add, change, delete)
 
+    # apply permissions for Pool
+    add = Permission.objects.get(codename='add_pool')
+    change = Permission.objects.get(codename='change_pool')
+    delete = Permission.objects.get(codename='delete_pool')
+    # supervisors can change
+    supervisors.permissions.add(change)
+    # only managers can add or delete
+    managers.permissions.add(add, change, delete)
+
 
 def create_init_superuser(apps, schema_editor):
     """Create the initial superuser."""
