@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Fund, PhonathonUser, Pledge, Prospect
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
 from .views import home
 
 
@@ -86,6 +86,22 @@ class TestGroups(TestCase):
         self.assertIn(delete, self.manager_perms)
         self.assertNotIn(add, self.supervisor_perms)
         self.assertNotIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
+    def test_permissions_pool(self):
+        """Tests for Pool permission."""
+        add = Permission.objects.get(codename='add_pool')
+        change = Permission.objects.get(codename='change_pool')
+        delete = Permission.objects.get(codename='delete_pool')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
         self.assertNotIn(delete, self.supervisor_perms)
         self.assertNotIn(add, self.caller_perms)
         self.assertNotIn(change, self.caller_perms)
@@ -175,6 +191,15 @@ class TestPledge(TestCase):
             pledge_amount=50, pledge_fund=test_fund, prospect=test_prospect)
         self.assertEqual(str(test_pledge),
                          'Alex Ang (S1234567A) - $50 (NTU Bursaries)')
+
+
+class TestPool(TestCase):
+    """Tests for model Pool."""
+
+    def test_string_representation(self):
+        """Test the string representation."""
+        test_model = Pool(name='AQ2017')
+        self.assertEqual(str(test_model), 'AQ2017')
 
 
 class TestViews(TestCase):

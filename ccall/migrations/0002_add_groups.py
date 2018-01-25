@@ -62,15 +62,31 @@ def add_groups(apps, schema_editor):
     # only managers can do this
     managers.permissions.add(add, change, delete)
 
+    # apply permissions for Pool
+    add = Permission.objects.get(codename='add_pool')
+    change = Permission.objects.get(codename='change_pool')
+    delete = Permission.objects.get(codename='delete_pool')
+    # supervisors can change
+    supervisors.permissions.add(change)
+    # only managers can add or delete
+    managers.permissions.add(add, change, delete)
+
 
 def create_init_superuser(apps, schema_editor):
     """Create the initial superuser."""
     from django.contrib.auth.hashers import make_password
 
     PhonathonUser = apps.get_model('ccall', 'PhonathonUser')
-    superuser = PhonathonUser(username='admin', password=make_password(
+    db_alias = schema_editor.connection.alias
+    PhonathonUser.objects.using(db_alias).create(username='admin', password=make_password(
         'admin'), name='Admin', email='admin@admin.com', is_staff=True, is_superuser=True)
-    superuser.save()
+
+
+def remove_init_superuser(apps, schema_editor):
+    """Remove the initial superuser."""
+    PhonathonUser = apps.get_model('ccall', 'PhonathonUser')
+    db_alias = schema_editor.connection.alias
+    PhonathonUser.objects.using(db_alias).get(username='admin').delete()
 
 
 class Migration(migrations.Migration):
@@ -81,7 +97,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_permissions),
-        migrations.RunPython(add_groups),
-        migrations.RunPython(create_init_superuser),
+        migrations.RunPython(add_permissions, migrations.RunPython.noop),
+        migrations.RunPython(add_groups, migrations.RunPython.noop),
+        migrations.RunPython(create_init_superuser, remove_init_superuser),
     ]

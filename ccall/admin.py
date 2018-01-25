@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Fund, PhonathonUser, Pledge, Prospect
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
 
 
 class PhonathonUserAdmin(UserAdmin):
@@ -40,3 +40,4 @@ admin.site.register(PhonathonUser, PhonathonUserAdmin)
 admin.site.register(Prospect, ProspectAdmin)
 admin.site.register(Pledge)
 admin.site.register(Fund)
+admin.site.register(Pool)
