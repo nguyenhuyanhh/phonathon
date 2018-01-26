@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect, ResultCode
 from .views import home
 
 
@@ -200,6 +200,15 @@ class TestPool(TestCase):
         """Test the string representation."""
         test_model = Pool(name='AQ2017')
         self.assertEqual(str(test_model), 'AQ2017')
+
+
+class TestResultCode(TestCase):
+    """Tests for model ResultCode."""
+
+    def test_string_representation(self):
+        """Test the string representation."""
+        test_model = ResultCode(result_code='Specified Pledge (EM)')
+        self.assertEqual(str(test_model), 'Specified Pledge (EM)')
 
 
 class TestViews(TestCase):
