@@ -19,6 +19,7 @@ class PhonathonUserAdmin(UserAdmin):
     )
     add_fieldsets = (
         (None, {'fields': ('username', 'name', 'email', 'password1', 'password2')}),
+        ('Permissions', {'fields': ('is_active', 'groups')}),
     )
 
 
