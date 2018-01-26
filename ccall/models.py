@@ -83,3 +83,12 @@ class Pool(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ResultCode(models.Model):
+    """Model for calling result codes."""
+    result_code = models.CharField(
+        max_length=25, verbose_name='Result code', unique=True)
+
+    def __str__(self):
+        return self.result_code
