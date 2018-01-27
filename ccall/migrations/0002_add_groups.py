@@ -71,6 +71,13 @@ def add_groups(apps, schema_editor):
     # only managers can add or delete
     managers.permissions.add(add, change, delete)
 
+    # apply permissions for ResultCode
+    add = Permission.objects.get(codename='add_resultcode')
+    change = Permission.objects.get(codename='change_resultcode')
+    delete = Permission.objects.get(codename='delete_resultcode')
+    # only managers can do this
+    managers.permissions.add(add, change, delete)
+
 
 def create_init_superuser(apps, schema_editor):
     """Create the initial superuser."""
