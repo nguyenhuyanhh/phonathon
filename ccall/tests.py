@@ -169,6 +169,19 @@ class TestInitialSuperuser(TestCase):
         self.assertTrue(superuser.is_staff)
 
 
+class TestInitialResultCodes(TestCase):
+    """Tests for the initial result codes."""
+
+    def test_initial_result_code_count(self):
+        """Tests for the number of initial result codes."""
+        self.assertEqual(len(ResultCode.objects.all()), 13)
+
+    def test_initial_result_code_type(self):
+        """Tests for the types of initial result codes."""
+        self.assertEqual(len(ResultCode.objects.filter(is_complete=False)), 2)
+        self.assertEqual(len(ResultCode.objects.filter(is_complete=True)), 11)
+
+
 class TestPhonathonUser(TestCase):
     """Tests for model User."""
 
