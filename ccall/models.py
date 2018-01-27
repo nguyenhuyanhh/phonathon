@@ -90,7 +90,7 @@ class ResultCode(models.Model):
     result_code = models.CharField(
         max_length=25, verbose_name='Result code', unique=True)
     is_complete = models.BooleanField(
-        verbose_name='Complete status', default=False)
+        verbose_name='Complete status', default=True)
 
     def __str__(self):
         return self.result_code
