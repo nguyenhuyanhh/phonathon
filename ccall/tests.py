@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect, ResultCode
 from .views import home
 
 
@@ -107,6 +107,22 @@ class TestGroups(TestCase):
         self.assertNotIn(change, self.caller_perms)
         self.assertNotIn(delete, self.caller_perms)
 
+    def test_permissions_resultcode(self):
+        """Tests for ResultCode permission."""
+        add = Permission.objects.get(codename='add_resultcode')
+        change = Permission.objects.get(codename='change_resultcode')
+        delete = Permission.objects.get(codename='delete_resultcode')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertNotIn(add, self.supervisor_perms)
+        self.assertNotIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
 
 class TestStaffStatus(TestCase):
     """Tests for staff status."""
@@ -151,6 +167,19 @@ class TestInitialSuperuser(TestCase):
         superuser = PhonathonUser.objects.get(username='admin')
         self.assertTrue(superuser.is_superuser)
         self.assertTrue(superuser.is_staff)
+
+
+class TestInitialResultCodes(TestCase):
+    """Tests for the initial result codes."""
+
+    def test_initial_result_code_count(self):
+        """Tests for the number of initial result codes."""
+        self.assertEqual(len(ResultCode.objects.all()), 13)
+
+    def test_initial_result_code_type(self):
+        """Tests for the types of initial result codes."""
+        self.assertEqual(len(ResultCode.objects.filter(is_complete=False)), 2)
+        self.assertEqual(len(ResultCode.objects.filter(is_complete=True)), 11)
 
 
 class TestPhonathonUser(TestCase):
@@ -200,6 +229,15 @@ class TestPool(TestCase):
         """Test the string representation."""
         test_model = Pool(name='AQ2017')
         self.assertEqual(str(test_model), 'AQ2017')
+
+
+class TestResultCode(TestCase):
+    """Tests for model ResultCode."""
+
+    def test_string_representation(self):
+        """Test the string representation."""
+        test_model = ResultCode(result_code='Specified Pledge (EM)')
+        self.assertEqual(str(test_model), 'Specified Pledge (EM)')
 
 
 class TestViews(TestCase):

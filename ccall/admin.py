@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect, ResultCode
 
 
 class PhonathonUserAdmin(UserAdmin):
@@ -19,6 +19,7 @@ class PhonathonUserAdmin(UserAdmin):
     )
     add_fieldsets = (
         (None, {'fields': ('username', 'name', 'email', 'password1', 'password2')}),
+        ('Permissions', {'fields': ('is_active', 'groups')}),
     )
 
 
@@ -41,3 +42,4 @@ admin.site.register(Prospect, ProspectAdmin)
 admin.site.register(Pledge)
 admin.site.register(Fund)
 admin.site.register(Pool)
+admin.site.register(ResultCode)
