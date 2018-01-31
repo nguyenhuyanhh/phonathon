@@ -30,3 +30,5 @@ In this project, users are assigned groups (either Managers, Supervisors or Call
 | Prospect | CRUD | RU | RU
 | Fund | CRUD | R | R
 | Pledge | CRUD | R | R
+| Pool | CRUD | RU | R
+| ResultCode | CRUD | R | R
