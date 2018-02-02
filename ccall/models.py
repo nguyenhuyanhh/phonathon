@@ -63,7 +63,8 @@ class Fund(models.Model):
 class Pledge(models.Model):
     """Model for a Pledge."""
     pledge_amount = models.DecimalField(
-        verbose_name='Pledge amount', decimal_places=2, max_digits=12)
+        verbose_name='Pledge amount', blank=True, decimal_places=2,
+        max_digits=12, validators=[MinValueValidator(0)])
     pledge_fund = models.ForeignKey(Fund, on_delete=models.CASCADE)
     pledge_date = models.DateField(verbose_name='Pledge date')
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
@@ -94,3 +95,30 @@ class ResultCode(models.Model):
 
     def __str__(self):
         return self.result_code
+
+
+class Call(models.Model):
+    """Model for a Call."""
+    METHOD_CHECK = 'Check'
+    METHOD_CREDIT = 'Credit'
+    METHOD_EFT = 'EFT'
+    METHODS = (
+        (METHOD_CHECK, METHOD_CHECK),
+        (METHOD_CREDIT, METHOD_CREDIT),
+        (METHOD_EFT, METHOD_EFT),
+    )
+    caller = models.ForeignKey(PhonathonUser, verbose_name='Caller')
+    call_time = models.DateTimeField(verbose_name='Time', auto_now=True)
+    prospect = models.ForeignKey(Prospect, verbose_name='Prospect')
+    pool = models.ForeignKey(Pool, verbose_name='Pool')
+    result_code = models.ForeignKey(ResultCode, verbose_name='Result code')
+    comment = models.TextField(verbose_name='Comments', blank=True)
+    pledge_amount = models.DecimalField(
+        verbose_name='Pledge amount', blank=True, decimal_places=2,
+        max_digits=12, validators=[MinValueValidator(0)])
+    pledge_method = models.CharField(
+        verbose_name='Pledge method', max_length=10, choices=METHODS, blank=True)
+    pledge_meta = models.TextField(verbose_name='Pledge metadata', blank=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.prospect, self.caller)
