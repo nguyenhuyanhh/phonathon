@@ -63,7 +63,7 @@ class Fund(models.Model):
 class Pledge(models.Model):
     """Model for a Pledge."""
     pledge_amount = models.DecimalField(
-        verbose_name='Pledge amount', blank=True, decimal_places=2,
+        verbose_name='Pledge amount', decimal_places=2,
         max_digits=12, validators=[MinValueValidator(0)])
     pledge_fund = models.ForeignKey(Fund, on_delete=models.CASCADE)
     pledge_date = models.DateField(verbose_name='Pledge date')
