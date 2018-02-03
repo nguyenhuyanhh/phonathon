@@ -107,11 +107,15 @@ class Call(models.Model):
         (METHOD_CREDIT, METHOD_CREDIT),
         (METHOD_EFT, METHOD_EFT),
     )
-    caller = models.ForeignKey(PhonathonUser, verbose_name='Caller')
+    caller = models.ForeignKey(
+        PhonathonUser, verbose_name='Caller', on_delete=models.CASCADE)
     call_time = models.DateTimeField(verbose_name='Time', auto_now=True)
-    prospect = models.ForeignKey(Prospect, verbose_name='Prospect')
-    pool = models.ForeignKey(Pool, verbose_name='Pool')
-    result_code = models.ForeignKey(ResultCode, verbose_name='Result code')
+    prospect = models.ForeignKey(
+        Prospect, verbose_name='Prospect', on_delete=models.CASCADE)
+    pool = models.ForeignKey(Pool, verbose_name='Pool',
+                             on_delete=models.SET_NULL, null=True)
+    result_code = models.ForeignKey(
+        ResultCode, verbose_name='Result code', on_delete=models.CASCADE)
     comment = models.TextField(verbose_name='Comments', blank=True)
     pledge_amount = models.DecimalField(
         verbose_name='Pledge amount', blank=True, decimal_places=2,
