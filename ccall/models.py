@@ -44,8 +44,9 @@ class Prospect(models.Model):
     education_school = models.CharField(
         max_length=50, verbose_name='School graduated from')
     education_degree = models.CharField(max_length=50, verbose_name='Degree')
-    education_year = models.PositiveIntegerField(verbose_name='Year of graduation', validators=(
-        MinValueValidator(1950), MaxValueValidator(timezone.now().year)))
+    education_year = models.PositiveIntegerField(
+        verbose_name='Year of graduation', validators=(
+            MinValueValidator(1950), MaxValueValidator(timezone.now().year)))
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.nric)
@@ -70,7 +71,8 @@ class Pledge(models.Model):
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
 
     def __str__(self):
-        return '{} - ${} ({})'.format(self.prospect, self.pledge_amount, self.pledge_fund)
+        return '{} - ${} ({})'.format(
+            self.prospect, self.pledge_amount, self.pledge_fund)
 
 
 class Pool(models.Model):
@@ -121,7 +123,8 @@ class Call(models.Model):
         verbose_name='Pledge amount', blank=True, decimal_places=2,
         max_digits=12, validators=[MinValueValidator(0)])
     pledge_method = models.CharField(
-        verbose_name='Pledge method', max_length=10, choices=METHODS, blank=True)
+        verbose_name='Pledge method', max_length=10,
+        choices=METHODS, blank=True)
     pledge_meta = models.TextField(verbose_name='Pledge metadata', blank=True)
 
     def __str__(self):

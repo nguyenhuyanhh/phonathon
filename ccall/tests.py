@@ -7,7 +7,8 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Call, Fund, PhonathonUser, Pledge, Pool, Prospect, ResultCode
+from .models import (Call, Fund, PhonathonUser, Pledge,
+                     Pool, Prospect, ResultCode)
 from .views import home
 
 
@@ -207,7 +208,9 @@ class TestModels(TestCase):
     def test_string_pledge(self):
         """Test the string representation for Pledge."""
         test_pledge = Pledge(
-            pledge_amount=50, pledge_fund=self.test_fund, prospect=self.test_prospect)
+            pledge_amount=50,
+            pledge_fund=self.test_fund,
+            prospect=self.test_prospect)
         self.assertEqual(str(test_pledge),
                          'Alex Ang (S1234567A) - $50 (NTU Bursaries)')
 
