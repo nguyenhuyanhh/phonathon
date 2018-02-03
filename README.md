@@ -63,3 +63,4 @@ In this project, users are assigned groups (either Managers, Supervisors or Call
 | Pledge | CRUD | R | R
 | Pool | CRUD | RU | R
 | ResultCode | CRUD | R | R
+| Call | CRUD | CRU | CR
