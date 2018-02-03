@@ -3,13 +3,9 @@
 
 from __future__ import unicode_literals
 
-import logging
-
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from .models import PhonathonUser
-
-LOG = logging.getLogger(__name__)
 
 
 @receiver(m2m_changed, sender=PhonathonUser.groups.through)

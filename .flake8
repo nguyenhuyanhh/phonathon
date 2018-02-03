@@ -1,0 +1,5 @@
+[flake8]
+exclude = 
+    # Auto-generated files
+    ccall/migrations/*
+    manage.py

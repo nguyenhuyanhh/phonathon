@@ -7,7 +7,8 @@ from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import resolve
 
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect, ResultCode
+from .models import (Call, Fund, PhonathonUser, Pledge,
+                     Pool, Prospect, ResultCode)
 from .views import home
 
 
@@ -123,6 +124,22 @@ class TestGroups(TestCase):
         self.assertNotIn(change, self.caller_perms)
         self.assertNotIn(delete, self.caller_perms)
 
+    def test_permissions_call(self):
+        """Tests for Call permission."""
+        add = Permission.objects.get(codename='add_call')
+        change = Permission.objects.get(codename='change_call')
+        delete = Permission.objects.get(codename='delete_call')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
+        self.assertNotIn(delete, self.supervisor_perms)
+        self.assertIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
 
 class TestStaffStatus(TestCase):
     """Tests for staff status."""
@@ -182,62 +199,50 @@ class TestInitialResultCodes(TestCase):
         self.assertEqual(len(ResultCode.objects.filter(is_complete=True)), 11)
 
 
-class TestPhonathonUser(TestCase):
-    """Tests for model User."""
+class TestModels(TestCase):
+    """Tests for all the models in the project."""
 
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_model = PhonathonUser(username='AlexA', name='Alex Ang')
-        self.assertEqual(str(test_model), 'Alex Ang (AlexA)')
+    def setUp(self):
+        self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
+        self.test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
+        self.test_fund = Fund(name='NTU Bursaries')
+        self.test_pool = Pool(name='AQ2017')
+        self.test_result_code = ResultCode(result_code='Specified Pledge (EM)')
 
+    def test_string_user(self):
+        """Test the string representation for PhonathonUser."""
+        self.assertEqual(str(self.test_user), 'Alex Ang (AlexA)')
 
-class TestProspect(TestCase):
-    """Tests for model Prospect."""
+    def test_string_prospect(self):
+        """Test the string representation for Prospect."""
+        self.assertEqual(str(self.test_prospect), 'Alex Ang (S1234567A)')
 
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_model = Prospect(name='Alex Ang', nric='S1234567A')
-        self.assertEqual(str(test_model), 'Alex Ang (S1234567A)')
+    def test_string_fund(self):
+        """Test the string representation for Fund."""
+        self.assertEqual(str(self.test_fund), 'NTU Bursaries')
 
-
-class TestFund(TestCase):
-    """Tests for model Fund."""
-
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_model = Fund(name='NTU Bursaries')
-        self.assertEqual(str(test_model), 'NTU Bursaries')
-
-
-class TestPledge(TestCase):
-    """Tests for model Pledge."""
-
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
-        test_fund = Fund(name='NTU Bursaries')
+    def test_string_pledge(self):
+        """Test the string representation for Pledge."""
         test_pledge = Pledge(
-            pledge_amount=50, pledge_fund=test_fund, prospect=test_prospect)
+            pledge_amount=50,
+            pledge_fund=self.test_fund,
+            prospect=self.test_prospect)
         self.assertEqual(str(test_pledge),
                          'Alex Ang (S1234567A) - $50 (NTU Bursaries)')
 
+    def test_string_pool(self):
+        """Test the string representation for Pool."""
+        self.assertEqual(str(self.test_pool), 'AQ2017')
 
-class TestPool(TestCase):
-    """Tests for model Pool."""
+    def test_string_result_code(self):
+        """Test the string representation for ResultCode."""
+        self.assertEqual(str(self.test_result_code), 'Specified Pledge (EM)')
 
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_model = Pool(name='AQ2017')
-        self.assertEqual(str(test_model), 'AQ2017')
-
-
-class TestResultCode(TestCase):
-    """Tests for model ResultCode."""
-
-    def test_string_representation(self):
-        """Test the string representation."""
-        test_model = ResultCode(result_code='Specified Pledge (EM)')
-        self.assertEqual(str(test_model), 'Specified Pledge (EM)')
+    def test_string_call(self):
+        """Test the string representation for Call."""
+        test_call = Call(caller=self.test_user, prospect=self.test_prospect)
+        self.assertEqual(
+            str(test_call), 'Alex Ang (S1234567A) - Alex Ang (AlexA)')
 
 
 class TestViews(TestCase):

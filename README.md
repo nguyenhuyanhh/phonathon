@@ -14,6 +14,37 @@ The current focus is on getting a minimum working example for presentation to st
 
 ## Documentation
 
+### Setup Instructions (for development)
+
+1. Clone this repository: 
+
+```sh
+git clone https://github.com/nguyenhuyanhh/phonathon.git
+```
+
+2. Install Python dependencies (including Django):
+
+```sh
+cd phonathon
+pip3 install --user -r requirements.txt
+```
+
+3. Migrate the development database: 
+
+```
+python3 manage.py migrate
+```
+
+4. Run the development server:
+
+```
+python3 manage.py runserver
+```
+
+5. Visit [localhost:8000](localhost:8000) in a browser, or [localhost:8000/admin](localhost:8000/admin) to visit the admin site. Login using the superuser credentials, and make changes!
+
+The project is developed using Python 3.5.2 on Lubuntu 16.04 LTS. Automated testing is done against the latest versions of Python and Django.
+
 ### Models
 
 The following class diagram describes the models implemented in the project.
