@@ -12,4 +12,4 @@ class CcallConfig(AppConfig):
     verbose_name = 'Phonathon'
 
     def ready(self):
-        import ccall.signals
+        import ccall.signals  # noqa
