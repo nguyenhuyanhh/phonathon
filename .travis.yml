@@ -1,16 +1,21 @@
 language: python
 python:
+  - "2.7"
   - "3.5"
   - "3.6"
 env:
-  - DJANGO_VERSION=1.11.10
-  - DJANGO_VERSION=2.0.2
+  - DJANGO="Django<1.12,>=1.11"
+  - DJANGO="Django<2.1,>=2.0"
 git:
   depth: 5
 install:
   - echo "$(tail -n +2 requirements.txt)" > requirements.txt
   - pip install -r requirements.txt
-  - pip install Django==$DJANGO_VERSION
+  - pip install $DJANGO
 script:
   - python manage.py migrate
   - python manage.py test
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO="Django<2.1,>=2.0"
