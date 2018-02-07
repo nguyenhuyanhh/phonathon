@@ -16,8 +16,9 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.views.generic.base import RedirectView
 
-from ccall import views
+from ccall import views as ccall_views
 
 urlpatterns = [
     url(r'^login/$',
@@ -26,6 +27,7 @@ urlpatterns = [
     url(r'^logout/$',
         auth_views.LogoutView.as_view(template_name='ccall/logout.html'),
         name='logout'),
-    url(r'^$', views.home),
+    url(r'^ccall/$', ccall_views.home, name='ccall'),
     url(r'^admin/', admin.site.urls),
+    url(r'^$', RedirectView.as_view(url='ccall')),
 ]
