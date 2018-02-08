@@ -94,6 +94,7 @@ AUTH_USER_MODEL = 'ccall.PhonathonUser'
 
 # Logging in and out
 LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'ccall'
 LOGOUT_REDIRECT_URL = 'login'
 
 

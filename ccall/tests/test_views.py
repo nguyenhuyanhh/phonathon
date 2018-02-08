@@ -3,12 +3,11 @@
 
 from __future__ import unicode_literals
 
-from django.contrib.auth.views import LoginView, LogoutView
 from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..views import home
+from ..views import LoginView, LogoutView, home
 
 
 class TestViews(TestCase):
