@@ -1,36 +1,54 @@
 {% extends "ccall/base.html" %}
 
 {% block header %}
+{% comment %} No header {% endcomment %}
 {% endblock header %}
 
 {% block main %}
-
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
+<div class="container container-login mx-auto p-3 mb-0 rounded-top bg-dark text-light h5">
+    Phonathon
+</div>
+<div class="container container-login mx-auto p-3 rounded-bottom">
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        Your username and password didn't match. Please try again.
+    </div>
     {% endif %}
-{% endif %}
 
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<div class="form-group">
-    {{ form.username.label_tag }}
-    {{ form.username }}
-</div>
-<div class="form-group">
-    {{ form.password.label_tag }}
-    {{ form.password }}
-</div>
-<button type="submit" class="btn btn-primary">Login</button>
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+    {% if next %}
+        {% if user.is_authenticated %}
+        <div class="alert alert-danger">
+            Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.
+        </div>
+        {% else %}
+        <div class="alert alert-danger">
+            Please login to see this page.
+        </div>
+        {% endif %}
+    {% endif %}
 
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+        <input id="{{ form.username.id_for_label }}" name="{{ form.username.name }}" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+        <input id="{{ form.password.id_for_label }}" name="{{ form.password.name }}" type="password" class="form-control"/>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+</div>
+<div class="text-muted text-center mx-auto pt-3">
+    (c) Nguyen Huy Anh (2018)
+</div>
 {% endblock main %}
 
+{% block footer %}
+{% comment %} No footer {% endcomment %}
+{% endblock footer %}
