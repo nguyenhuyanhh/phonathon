@@ -16,9 +16,14 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from ccall import views
+from django.views.generic.base import RedirectView
+
+from ccall import views as ccall_views
 
 urlpatterns = [
-    url(r'^$', views.home),
+    url(r'^login/$', ccall_views.LoginView.as_view(), name='login'),
+    url(r'^logout/$', ccall_views.LogoutView.as_view(), name='logout'),
+    url(r'^ccall/$', ccall_views.home, name='ccall'),
     url(r'^admin/', admin.site.urls),
+    url(r'^$', RedirectView.as_view(url='ccall')),
 ]

@@ -46,3 +46,8 @@ admin.site.register(Fund)
 admin.site.register(Pool)
 admin.site.register(ResultCode)
 admin.site.register(Call)
+
+admin.site.site_header = 'Phonathon Administration'
+admin.site.site_title = admin.site.site_header
+admin.site.index_title = 'Home'
+admin.site.index_template = 'admin/index_no_sidebar.html'

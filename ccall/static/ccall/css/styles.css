@@ -1,0 +1,12 @@
+/* Main elements */
+body {
+    padding-top: 70px;
+    padding-bottom: 70px;
+    background-color: whitesmoke;
+}
+
+/* Login */
+.container-login {
+    width: 400px;
+    background: white
+}
