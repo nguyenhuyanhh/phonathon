@@ -75,9 +75,20 @@ class Pledge(models.Model):
             self.prospect, self.pledge_amount, self.pledge_fund)
 
 
+class Project(models.Model):
+    """Model for a Project."""
+    name = models.CharField(
+        max_length=50, verbose_name='Project name', unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Pool(models.Model):
     """Model for a Pool."""
     name = models.CharField(max_length=50, verbose_name='Pool name')
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, verbose_name='Project')
     max_attempts = models.PositiveSmallIntegerField(
         verbose_name='Maximum number of attempts')
     prospects = models.ManyToManyField(

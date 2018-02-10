@@ -62,6 +62,13 @@ def add_groups(apps, schema_editor):
     # only managers can do this
     managers.permissions.add(add, change, delete)
 
+    # apply permissions for Project
+    add = Permission.objects.get(codename='add_project')
+    change = Permission.objects.get(codename='change_project')
+    delete = Permission.objects.get(codename='delete_project')
+    # only managers can do this
+    managers.permissions.add(add, change, delete)
+
     # apply permissions for Pool
     add = Permission.objects.get(codename='add_pool')
     change = Permission.objects.get(codename='change_pool')
