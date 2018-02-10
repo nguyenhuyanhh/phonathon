@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from ..models import (Call, Fund, PhonathonUser, Pledge,
-                      Pool, Prospect, ResultCode)
+from ..models import (Call, Fund, PhonathonUser, Pledge, Pool, Project,
+                      Prospect, ResultCode)
 
 
 class TestModels(TestCase):
@@ -16,6 +16,7 @@ class TestModels(TestCase):
         self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
         self.test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
         self.test_fund = Fund(name='NTU Bursaries')
+        self.test_project = Project(name='Alumni Giving 2018')
         self.test_pool = Pool(name='AQ2017')
         self.test_result_code = ResultCode(result_code='Specified Pledge (EM)')
 
@@ -39,6 +40,10 @@ class TestModels(TestCase):
             prospect=self.test_prospect)
         self.assertEqual(str(test_pledge),
                          'Alex Ang (S1234567A) - $50 (NTU Bursaries)')
+
+    def test_string_project(self):
+        """Test the string representation for Project."""
+        self.assertEqual(str(self.test_project), 'Alumni Giving 2018')
 
     def test_string_pool(self):
         """Test the string representation for Pool."""
