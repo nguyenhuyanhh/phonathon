@@ -14,6 +14,12 @@ def home(request):
     return render(request, 'ccall/base.html')
 
 
+@login_required()
+def upload(request):
+    """Upload csv from admin interface."""
+    pass
+
+
 class LoginView(auth_views.LoginView):
     """Login view for ccall."""
     template_name = 'ccall/login.html'

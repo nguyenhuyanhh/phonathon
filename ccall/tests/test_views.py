@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..views import LoginView, LogoutView, home
+from ..views import (LoginView, LogoutView, home, upload)
 
 
 class TestViews(TestCase):
@@ -22,6 +22,11 @@ class TestViews(TestCase):
         """Test whether /ccall/ resolves to default view."""
         view = resolve('/ccall/')
         self.assertEqual(view.func, home)
+
+    def test_view_upload(self):
+        """Test whether /admin/upload resolves to upload view."""
+        view = resolve('/admin/upload/')
+        self.assertEqual(view.func, upload)
 
     def test_view_login(self):
         """Test whether login/ resolves to login view."""
