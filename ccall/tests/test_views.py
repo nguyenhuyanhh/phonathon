@@ -7,33 +7,37 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..views import (LoginView, LogoutView, home, upload)
+from ..views import LoginView, LogoutView, home, upload
 
 
-class TestViews(TestCase):
-    """Tests for views."""
+class TestGenericViews(TestCase):
+    """Tests for generic views."""
 
-    def test_view_root(self):
+    def test_resolve_url_root(self):
         """Test whether empty url redirects to default view."""
         view = resolve('/')
         self.assertEqual(view.func.view_class, RedirectView)
 
-    def test_view_ccall(self):
+    def test_resolve_url_ccall(self):
         """Test whether /ccall/ resolves to default view."""
         view = resolve('/ccall/')
         self.assertEqual(view.func, home)
 
-    def test_view_upload(self):
-        """Test whether /admin/upload resolves to upload view."""
-        view = resolve('/admin/upload/')
-        self.assertEqual(view.func, upload)
-
-    def test_view_login(self):
+    def test_resolve_url_login(self):
         """Test whether login/ resolves to login view."""
         view = resolve('/login/')
         self.assertEqual(view.func.view_class, LoginView)
 
-    def test_view_logout(self):
+    def test_resolve_url_logout(self):
         """Test whether logout/ resolves to logout view."""
         view = resolve('/logout/')
         self.assertEqual(view.func.view_class, LogoutView)
+
+
+class TestUploadView(TestCase):
+    """Test the upload view."""
+
+    def test_resolve_url_upload(self):
+        """Test whether /admin/upload resolves to upload view."""
+        view = resolve('/admin/upload/')
+        self.assertEqual(view.func, upload)
