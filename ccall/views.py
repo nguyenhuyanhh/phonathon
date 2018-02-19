@@ -70,6 +70,9 @@ def upload(request):
             model, _func = _get_model_func(form.cleaned_data['model'])
             _func(model, data)
             return HttpResponseRedirect('/admin/')
+        else:
+            return render(request, 'admin/upload.html',
+                          {'form': UploadForm, 'title': 'Upload data'})
     except BaseException as exc:
         print(exc)
 
