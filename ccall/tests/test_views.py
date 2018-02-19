@@ -3,10 +3,13 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
+from ..models import PhonathonUser
 from ..views import LoginView, LogoutView, home, upload
 
 
@@ -36,8 +39,27 @@ class TestGenericViews(TestCase):
 
 class TestUploadView(TestCase):
     """Test the upload view."""
+    cur_dir = os.path.dirname(os.path.realpath(__file__))
+    data_dir = os.path.join(cur_dir, 'test_data')
+
+    def setUp(self):
+        user = PhonathonUser.objects.create_user(
+            username='test')
+        self.client.force_login(user)
 
     def test_resolve_url_upload(self):
         """Test whether /admin/upload resolves to upload view."""
         view = resolve('/admin/upload/')
         self.assertEqual(view.func, upload)
+
+    def test_upload_user(self):
+        """Test upload a user CSV file."""
+        data_file = os.path.join(self.data_dir, 'test_user.csv')
+        with open(data_file, 'r') as csv_:
+            response = self.client.post('/admin/upload/',
+                                        {'model': 'Caller',
+                                         'uploaded_file': csv_},
+                                        follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            PhonathonUser.objects.filter(username__in=['Test1']).count(), 1)
