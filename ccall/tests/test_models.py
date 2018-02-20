@@ -3,14 +3,15 @@
 
 from __future__ import unicode_literals
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from ..models import (Call, Fund, PhonathonUser, Pledge, Pool, Project,
                       Prospect, ResultCode)
 
 
-class TestModels(TestCase):
-    """Tests for all the models in the project."""
+class TestStrings(TestCase):
+    """Tests for string representation for all models in the project."""
 
     def setUp(self):
         self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
@@ -58,3 +59,25 @@ class TestModels(TestCase):
         test_call = Call(caller=self.test_user, prospect=self.test_prospect)
         self.assertEqual(
             str(test_call), 'Alex Ang (S1234567A) - Alex Ang (AlexA)')
+
+
+class TestPhonathonUser(TestCase):
+    """Test cases for PhonathonUser."""
+
+    def setUp(self):
+        self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
+        self.test_user.save()
+
+    def test_manager_and_above_manager(self):
+        """Test the attribute is_manager_and_above for Managers."""
+        self.test_user.groups.add(Group.objects.get(name='Managers'))
+        self.assertTrue(self.test_user.is_manager_and_above)
+
+    def test_manager_and_above_superuser(self):
+        """Test the attribute is_manager_and_above for superusers."""
+        self.test_user.is_superuser = True
+        self.assertTrue(self.test_user.is_manager_and_above)
+
+    def test_manager_and_above_other(self):
+        """Test the attribute is_manager_and_above for other users."""
+        self.assertFalse(self.test_user.is_manager_and_above)

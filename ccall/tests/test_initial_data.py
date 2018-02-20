@@ -59,9 +59,11 @@ class TestInitialResultCodes(TestCase):
 
     def test_initial_result_code_count(self):
         """Tests for the number of initial result codes."""
-        self.assertEqual(len(ResultCode.objects.all()), 13)
+        self.assertEqual(ResultCode.objects.count(), 13)
 
     def test_initial_result_code_type(self):
         """Tests for the types of initial result codes."""
-        self.assertEqual(len(ResultCode.objects.filter(is_complete=False)), 2)
-        self.assertEqual(len(ResultCode.objects.filter(is_complete=True)), 11)
+        self.assertEqual(ResultCode.objects.filter(
+            is_complete=False).count(), 2)
+        self.assertEqual(ResultCode.objects.filter(
+            is_complete=True).count(), 11)

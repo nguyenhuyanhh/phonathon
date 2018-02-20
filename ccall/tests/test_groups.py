@@ -19,9 +19,9 @@ class TestGroups(TestCase):
 
     def test_groups(self):
         """Tests for existence of groups."""
-        self.assertEqual(len(Group.objects.all()), 3)
-        self.assertEqual(len(Group.objects.filter(
-            name__in=['Managers', 'Supervisors', 'Callers'])), 3)
+        self.assertEqual(Group.objects.count(), 3)
+        self.assertEqual(Group.objects.filter(
+            name__in=['Managers', 'Supervisors', 'Callers']).count(), 3)
 
     def test_permissions_user(self):
         """Tests for User permission."""
