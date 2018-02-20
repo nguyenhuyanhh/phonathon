@@ -3,9 +3,12 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 
 from .forms import UploadForm
@@ -27,18 +30,38 @@ def _process_user_data(model, data):
     """Process data for the User model."""
     for obj in data:
         try:
-            model.objects.create_user(**obj)
-        except BaseException:
-            print(obj)
+            # default password = username if not exist
+            username = obj['username']
+            if 'password' not in obj or not obj['password']:
+                obj['password'] = username
+            try:
+                user_obj = model.objects.get_by_natural_key(username)
+                # update attributes
+                for attr, value in obj.items():
+                    setattr(user_obj, attr, value)
+                # manually set passwords
+                user_obj.set_password(obj['password'])
+                user_obj.save()
+                logging.getLogger('ccall').debug(
+                    'Updated %s object: %s', model.__name__, obj)
+            except ObjectDoesNotExist:
+                # create new user
+                user_obj = model.objects.create_user(**obj)
+                user_obj.set_password(obj['password'])
+                user_obj.save()
+                logging.getLogger('ccall').debug(
+                    'Created %s object: %s', model.__name__, obj)
+        except BaseException as exc_:
+            logging.getLogger('ccall').error('(%s) %s', str(exc_), obj)
 
 
 def _process_data(model, data):
     """Process data for other models."""
     for obj in data:
         try:
-            model.objects.create(**obj)
-        except BaseException:
-            print(obj)
+            model.objects.update_or_create(**obj)
+        except BaseException as exc_:
+            logging.getLogger('ccall').error('%s: %s', str(exc_), obj)
 
 
 @login_required()
