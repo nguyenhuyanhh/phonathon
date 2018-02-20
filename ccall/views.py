@@ -36,10 +36,10 @@ def _process_user_data(model, data):
                 obj['password'] = username
             try:
                 user_obj = model.objects.get_by_natural_key(username)
-                # update attributes
+                # update user
                 for attr, value in obj.items():
                     setattr(user_obj, attr, value)
-                # manually set passwords
+                # manually set password
                 user_obj.set_password(obj['password'])
                 user_obj.save()
                 logging.getLogger('ccall').debug(
@@ -47,8 +47,6 @@ def _process_user_data(model, data):
             except ObjectDoesNotExist:
                 # create new user
                 user_obj = model.objects.create_user(**obj)
-                user_obj.set_password(obj['password'])
-                user_obj.save()
                 logging.getLogger('ccall').debug(
                     'Created %s object: %s', model.__name__, obj)
         except BaseException as exc_:
