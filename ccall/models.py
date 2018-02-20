@@ -22,6 +22,11 @@ class PhonathonUser(AbstractUser):
     def __str__(self):
         return '{} ({})'.format(self.name, self.username)
 
+    @property
+    def is_manager_and_above(self):
+        """Check whether an user is a Manager or above."""
+        return self.is_superuser or self.groups.filter(name='Managers').count()
+
 
 class Prospect(models.Model):
     """Model for a Prospect."""

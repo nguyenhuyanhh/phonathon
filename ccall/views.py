@@ -6,13 +6,18 @@ from __future__ import unicode_literals
 import logging
 
 from django.contrib.auth import views as auth_views
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 
 from .forms import UploadForm
 from .models import PhonathonUser
+
+
+def test_user_manager_and_above(user):
+    """Test whether an User is manager and above."""
+    return user.is_manager_and_above
 
 
 def _get_model_func(model_string):
@@ -69,6 +74,7 @@ def home(request):
 
 
 @login_required()
+@user_passes_test(test_user_manager_and_above)
 def upload(request):
     """Upload csv from admin interface."""
     import csv

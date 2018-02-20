@@ -7,10 +7,12 @@
         <caption>
             <a href="#" class="section" title="Frequently used functionalities">Shortcuts</a>
         </caption>
+        {% if user.is_manager_and_above %}
         <tr>
             <th scope="row"><a href="{% url 'upload' %}">Upload data</a></th>
             <td></td>
         </tr>
+        {% endif %}
         </table>
     </div>
 </div>
