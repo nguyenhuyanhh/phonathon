@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import os
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
@@ -44,7 +45,9 @@ class TestUploadView(TestCase):
 
     def setUp(self):
         user = PhonathonUser.objects.create_user(
-            username='test')
+            username='test', password='test')
+        user.groups.add(Group.objects.get(name='Managers'))
+        user.save()
         self.client.force_login(user)
 
     def test_resolve_url_upload(self):
