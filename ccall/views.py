@@ -7,12 +7,14 @@ import logging
 
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from .forms import UploadForm
-from .models import PhonathonUser
+from .models import Fund, PhonathonUser
+
+ccall_log = logging.getLogger('ccall')
 
 
 def test_user_manager_and_above(user):
@@ -20,18 +22,30 @@ def test_user_manager_and_above(user):
     return user.is_manager_and_above
 
 
-def _get_model_func(model_string):
+def get_model_func(model_string):
     """
     Parse the model choice to a Model class and
     corresponding processing function.
     """
-    if model_string == UploadForm.MODEL_USER:
-        return PhonathonUser, _process_user_data
-    else:
-        raise NotImplementedError('Cannot upload %s data', model_string)
+    lookup = {
+        UploadForm.MODEL_USER: {
+            "model": PhonathonUser,
+            "func": process_user_data
+        },
+        UploadForm.MODEL_FUND: {
+            "model": Fund,
+            "func": process_data
+        }
+    }
+    try:
+        result = lookup[model_string]
+        return result['model'], result['func']
+    except KeyError:
+        # Upload is not implemented for this model
+        ccall_log.error('Cannot upload %s data', model_string)
 
 
-def _process_user_data(model, data):
+def process_user_data(model, data):
     """Process data for the User model."""
     for obj in data:
         try:
@@ -47,24 +61,26 @@ def _process_user_data(model, data):
                 # manually set password
                 user_obj.set_password(obj['password'])
                 user_obj.save()
-                logging.getLogger('ccall').debug(
-                    'Updated %s object: %s', model.__name__, obj)
+                ccall_log.debug('Updated %s object: %s', model.__name__, obj)
             except ObjectDoesNotExist:
                 # create new user
                 user_obj = model.objects.create_user(**obj)
-                logging.getLogger('ccall').debug(
-                    'Created %s object: %s', model.__name__, obj)
+                ccall_log.debug('Created %s object: %s', model.__name__, obj)
         except BaseException as exc_:
-            logging.getLogger('ccall').error('(%s) %s', str(exc_), obj)
+            ccall_log.error('(%s) %s', str(exc_), obj)
 
 
-def _process_data(model, data):
+def process_data(model, data):
     """Process data for other models."""
     for obj in data:
         try:
-            model.objects.update_or_create(**obj)
+            _, created = model.objects.update_or_create(**obj)
+            if created:
+                ccall_log.debug('Created %s object: %s', model.__name__, obj)
+            else:
+                ccall_log.debug('Updated %s object: %s', model.__name__, obj)
         except BaseException as exc_:
-            logging.getLogger('ccall').error('%s: %s', str(exc_), obj)
+            ccall_log.error('%s: %s', str(exc_), obj)
 
 
 @login_required()
@@ -94,7 +110,7 @@ def upload(request):
             data = csv.DictReader(StringIO(csv_file.read().decode('utf-8')))
 
             # process data
-            model, _func = _get_model_func(form.cleaned_data['model'])
+            model, _func = get_model_func(form.cleaned_data['model'])
             _func(model, data)
             return HttpResponseRedirect('/admin/')
         else:
