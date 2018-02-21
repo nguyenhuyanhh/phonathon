@@ -9,8 +9,10 @@ from django import forms
 class UploadForm(forms.Form):
     """Form to upload a CSV file."""
     MODEL_USER = 'Caller'
+    MODEL_FUND = 'Fund'
     MODELS = (
         (MODEL_USER, MODEL_USER),
+        (MODEL_FUND, MODEL_FUND)
     )
     model = forms.ChoiceField(label='Data type', choices=MODELS)
     uploaded_file = forms.FileField(
