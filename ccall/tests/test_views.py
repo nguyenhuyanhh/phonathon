@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..models import PhonathonUser
+from ..models import Fund, PhonathonUser
 from ..views import LoginView, LogoutView, home, upload
 
 
@@ -66,3 +66,15 @@ class TestUploadView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             PhonathonUser.objects.filter(username__in=['Test1']).count(), 1)
+
+    def test_upload_fund(self):
+        """Test upload a fund CSV file."""
+        data_file = os.path.join(self.data_dir, 'test_fund.csv')
+        with open(data_file, 'r') as csv_:
+            response = self.client.post('/admin/upload/',
+                                        {'model': 'Fund',
+                                         'uploaded_file': csv_},
+                                        follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            Fund.objects.filter(name__in=['NTU Bursaries']).count(), 1)
