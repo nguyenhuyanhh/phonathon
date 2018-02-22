@@ -30,9 +30,32 @@ class PhonathonUser(AbstractUser):
 
 class Prospect(models.Model):
     """Model for a Prospect."""
+    # choices for salutation
+    SAL_MR = 'Mr'
+    SAL_MRS = 'Mrs'
+    SAL_MS = 'Ms'
+    SAL_MDM = 'Mdm'
+    SAL_DR = 'Dr'
+    SAL_CHOICES = (
+        (SAL_DR, SAL_DR),
+        (SAL_MDM, SAL_MDM),
+        (SAL_MR, SAL_MR),
+        (SAL_MRS, SAL_MRS),
+        (SAL_MS, SAL_MS),
+    )
+    # choices for gender
+    GENDER_MALE = 'M'
+    GENDER_FEMALE = 'F'
+    GENDER_CHOICES = (
+        (GENDER_FEMALE, GENDER_FEMALE),
+        (GENDER_MALE, GENDER_MALE),
+    )
+
     nric = models.CharField(max_length=15, verbose_name='NRIC', unique=True)
-    salutation = models.CharField(max_length=10)
+    salutation = models.CharField(
+        max_length=3, choices=SAL_CHOICES, blank=True)
     name = models.CharField(max_length=50)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=1, blank=True)
     email = models.EmailField(verbose_name='Email address', blank=True)
     address_1 = models.CharField(
         max_length=50, verbose_name='Address (line 1)', blank=True)

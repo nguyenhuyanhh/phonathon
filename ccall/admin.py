@@ -41,7 +41,7 @@ class ProspectAdmin(admin.ModelAdmin):
     """Admin interface for model Prospect."""
     list_display = ('nric', 'name', 'phone_home', 'phone_mobile')
     fieldsets = [
-        (None, {'fields': ('nric', 'salutation', 'name',
+        (None, {'fields': ('nric', 'salutation', 'name', 'gender',
                            'email', 'phone_home', 'phone_mobile')}),
         ('Address', {'fields': ('address_1',
                                 'address_2', 'address_3', 'address_postal')}),
