@@ -13,13 +13,14 @@ from ..models import (Call, Fund, PhonathonUser, Pledge, Pool, Project,
 class TestStrings(TestCase):
     """Tests for string representation for all models in the project."""
 
-    def setUp(self):
-        self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
-        self.test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
-        self.test_fund = Fund(name='NTU Bursaries')
-        self.test_project = Project(name='Alumni Giving 2018')
-        self.test_pool = Pool(name='AQ2017')
-        self.test_result_code = ResultCode(result_code='Specified Pledge (EM)')
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
+        cls.test_prospect = Prospect(name='Alex Ang', nric='S1234567A')
+        cls.test_fund = Fund(name='NTU Bursaries')
+        cls.test_project = Project(name='Alumni Giving 2018')
+        cls.test_pool = Pool(name='AQ2017')
+        cls.test_result_code = ResultCode(result_code='Specified Pledge (EM)')
 
     def test_string_user(self):
         """Test the string representation for PhonathonUser."""
@@ -64,9 +65,10 @@ class TestStrings(TestCase):
 class TestPhonathonUser(TestCase):
     """Test cases for PhonathonUser."""
 
-    def setUp(self):
-        self.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
-        self.test_user.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
+        cls.test_user.save()
 
     def test_manager_and_above_manager(self):
         """Test the attribute is_manager_and_above for Managers."""

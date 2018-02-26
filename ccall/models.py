@@ -28,8 +28,17 @@ class PhonathonUser(AbstractUser):
         return self.is_superuser or self.groups.filter(name='Managers').count()
 
 
+class ProspectManager(models.Manager):
+    """Custom manager for model Prospect."""
+
+    def get_by_natural_key(self, nric):
+        return self.get(nric=nric)
+
+
 class Prospect(models.Model):
     """Model for a Prospect."""
+    objects = ProspectManager()
+
     # choices for salutation
     SAL_MR = 'Mr'
     SAL_MRS = 'Mrs'
@@ -80,8 +89,17 @@ class Prospect(models.Model):
         return '{} ({})'.format(self.name, self.nric)
 
 
+class FundManager(models.Manager):
+    """Custom manager for model Fund."""
+
+    def get_by_natural_key(self, name):
+        return self.get(name=name)
+
+
 class Fund(models.Model):
     """Model for a Pledge Fund."""
+    objects = FundManager()
+
     name = models.CharField(verbose_name='Fund name',
                             max_length=50, unique=True)
 

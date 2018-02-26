@@ -10,12 +10,13 @@ from django.test import TestCase
 class TestGroups(TestCase):
     """Tests for default groups and permissions."""
 
-    def setUp(self):
-        self.manager_perms = Group.objects.get(
+    @classmethod
+    def setUpTestData(cls):
+        cls.manager_perms = Group.objects.get(
             name='Managers').permissions.all()
-        self.supervisor_perms = Group.objects.get(
+        cls.supervisor_perms = Group.objects.get(
             name='Supervisors').permissions.all()
-        self.caller_perms = Group.objects.get(name='Callers').permissions.all()
+        cls.caller_perms = Group.objects.get(name='Callers').permissions.all()
 
     def test_groups(self):
         """Tests for existence of groups."""
