@@ -83,13 +83,13 @@ def process_data(model, data):
             ccall_log.error('%s: %s', str(exc_), obj)
 
 
-@login_required()
+@login_required(login_url='login')
 def home(request):
     """Default view for ccall."""
     return render(request, 'ccall/base.html')
 
 
-@login_required()
+@login_required(login_url='login')
 @user_passes_test(test_user_manager_and_above)
 def upload(request):
     """Upload csv from admin interface."""
@@ -127,4 +127,4 @@ class LoginView(auth_views.LoginView):
 
 class LogoutView(auth_views.LogoutView):
     """Logout view for ccall."""
-    pass
+    next_page = 'login'

@@ -34,14 +34,13 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'ccall.apps.CcallConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'ccall.apps.CcallConfig',
 ]
 
 MIDDLEWARE = [
@@ -91,12 +90,6 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = []
 AUTH_USER_MODEL = 'ccall.PhonathonUser'
-
-# Logging in and out
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'ccall'
-LOGOUT_REDIRECT_URL = 'login'
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
