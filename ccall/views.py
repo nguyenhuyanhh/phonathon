@@ -9,7 +9,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm
 from .models import Fund, PhonathonUser
@@ -123,6 +123,14 @@ def upload(request):
 class LoginView(auth_views.LoginView):
     """Login view for ccall."""
     template_name = 'ccall/login.html'
+
+    def get_success_url(self):
+        # if managers and above, redirect to admin interface, else normal
+        if self.request.user.is_staff:
+            redirect_url = 'admin:index'
+        else:
+            redirect_url = 'ccall'
+        return resolve_url(redirect_url)
 
 
 class LogoutView(auth_views.LogoutView):
