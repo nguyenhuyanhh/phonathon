@@ -47,12 +47,16 @@ def process_user_data(model, data):
             try:
                 user_obj = model.objects.get_by_natural_key(username)
                 # update user
+                update_obj = {}
                 for attr, value in obj.items():
+                    if value != getattr(user_obj, attr):
                     setattr(user_obj, attr, value)
+                        update_obj[attr] = value
                 # manually set password
                 user_obj.set_password(obj['password'])
                 user_obj.save()
-                ccall_log.debug('Updated %s object: %s', model.__name__, obj)
+                ccall_log.debug('Updated %s object %s: %s',
+                                model.__name__, username, update_obj)
             except ObjectDoesNotExist:
                 # create new user
                 user_obj = model.objects.create_user(**obj)
