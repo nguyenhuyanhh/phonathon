@@ -65,7 +65,5 @@ admin.site.register(Call)
 admin.site.unregister(Group)
 
 # Admin site rendering settings
-admin.site.site_header = 'Phonathon Administration'
-admin.site.site_title = admin.site.site_header
 admin.site.index_title = 'Home'
 admin.site.index_template = 'admin/index_no_sidebar.html'
