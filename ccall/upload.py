@@ -8,7 +8,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import UploadForm
-from .models import Fund, PhonathonUser
+from .models import (Fund, PhonathonUser, Prospect)
 
 ccall_log = logging.getLogger('ccall')
 
@@ -25,6 +25,10 @@ def get_model_func(model_string):
         },
         UploadForm.MODEL_FUND: {
             "model": Fund,
+            "func": process_data
+        },
+        UploadForm.MODEL_PROSPECT: {
+            "model": Prospect,
             "func": process_data
         }
     }
@@ -50,7 +54,7 @@ def process_user_data(model, data):
                 update_obj = {}
                 for attr, value in obj.items():
                     if value != getattr(user_obj, attr):
-                    setattr(user_obj, attr, value)
+                        setattr(user_obj, attr, value)
                         update_obj[attr] = value
                 # manually set password
                 user_obj.set_password(obj['password'])
