@@ -9,7 +9,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm
 from .models import Fund, PhonathonUser
@@ -83,13 +83,13 @@ def process_data(model, data):
             ccall_log.error('%s: %s', str(exc_), obj)
 
 
-@login_required()
+@login_required(login_url='login')
 def home(request):
     """Default view for ccall."""
     return render(request, 'ccall/base.html')
 
 
-@login_required()
+@login_required(login_url='login')
 @user_passes_test(test_user_manager_and_above)
 def upload(request):
     """Upload csv from admin interface."""
@@ -124,7 +124,15 @@ class LoginView(auth_views.LoginView):
     """Login view for ccall."""
     template_name = 'ccall/login.html'
 
+    def get_success_url(self):
+        # if managers and above, redirect to admin interface, else normal
+        if self.request.user.is_staff:
+            redirect_url = 'admin:index'
+        else:
+            redirect_url = 'ccall'
+        return resolve_url(redirect_url)
+
 
 class LogoutView(auth_views.LogoutView):
     """Logout view for ccall."""
-    pass
+    next_page = 'login'

@@ -14,8 +14,8 @@ from ..models import Fund, PhonathonUser
 from ..views import LoginView, LogoutView, home, upload
 
 
-class TestGenericViews(TestCase):
-    """Tests for generic views."""
+class TestResolveURLs(TestCase):
+    """Tests for resolving URLs to views."""
 
     def test_resolve_url_root(self):
         """Test whether empty url redirects to default view."""
@@ -37,23 +37,68 @@ class TestGenericViews(TestCase):
         view = resolve('/logout/')
         self.assertEqual(view.func.view_class, LogoutView)
 
+    def test_resolve_url_upload(self):
+        """Test whether /admin/upload resolves to upload view."""
+        view = resolve('/admin/upload/')
+        self.assertEqual(view.func, upload)
+
+
+class TestLoginLogout(TestCase):
+    """Test the login-logout flow."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_normal_credentials = {
+            'username': 'test', 'password': 'test'
+        }
+        user_normal = PhonathonUser.objects.create_user(
+            **cls.user_normal_credentials)
+        user_normal.groups.add(Group.objects.get(name='Callers'))
+        user_normal.save()
+
+    def test_login_template(self):
+        """Test for the login template."""
+        response = self.client.get('/login/')
+        self.assertTemplateUsed(response, 'ccall/login.html')
+
+    def test_login_normal(self):
+        """Test login for normal user."""
+        response = self.client.post(
+            '/login/', self.user_normal_credentials, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], '/ccall/')
+
+    def test_login_elevated(self):
+        """Test login for elevated users (supervisors and above)."""
+        # use the default superuser
+        response = self.client.post(
+            '/login/', {'username': 'admin', 'password': 'admin'}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], '/admin/')
+
+    def test_logout(self):
+        """Test logout."""
+        self.client.post(
+            '/login/', self.user_normal_credentials, follow=True)
+        response = self.client.post('/logout/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], '/login/')
+
 
 class TestUploadView(TestCase):
     """Test the upload view."""
     cur_dir = os.path.dirname(os.path.realpath(__file__))
     data_dir = os.path.join(cur_dir, 'test_data')
 
-    def setUp(self):
-        user = PhonathonUser.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = PhonathonUser.objects.create_user(
             username='test', password='test')
-        user.groups.add(Group.objects.get(name='Managers'))
-        user.save()
-        self.client.force_login(user)
+        cls.user.groups.add(Group.objects.get(name='Managers'))
+        cls.user.save()
 
-    def test_resolve_url_upload(self):
-        """Test whether /admin/upload resolves to upload view."""
-        view = resolve('/admin/upload/')
-        self.assertEqual(view.func, upload)
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_upload_user(self):
         """Test upload a user CSV file."""

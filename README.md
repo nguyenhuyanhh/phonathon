@@ -45,6 +45,19 @@ python3 manage.py runserver
 
 The project is developed using Python 3.5.2 on Lubuntu 16.04 LTS. Automated testing is done against the latest versions of Python and Django.
 
+### URL Configuration
+
+The following URLs are applicable to the project:
+
+| URL | Description
+| --- | ---
+| `/` | Redirects to main calling interface 
+| `/ccall` | Main calling interface
+| `/admin` | Admin interface (accessible only to supervisors, managers and superusers)
+| `/admin/upload` | Upload data (accessible only to managers and superusers)
+| `/login` | Login
+| `/logout` | Logout, redirects back to login
+
 ### Models
 
 The following class diagram describes the models implemented in the project.
