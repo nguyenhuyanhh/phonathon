@@ -13,34 +13,42 @@ from .models import (Fund, PhonathonUser, Prospect)
 ccall_log = logging.getLogger('ccall')
 
 
-def get_model_func(model_string):
+def upload_data(data, model_string):
     """
     Parse the model choice to a Model class and
     corresponding processing function.
     """
     lookup = {
         UploadForm.MODEL_USER: {
-            "model": PhonathonUser,
-            "func": process_user_data
+            'func': _process_user_data,
+            'kwargs': {
+                'model': PhonathonUser
+            }
         },
         UploadForm.MODEL_FUND: {
-            "model": Fund,
-            "func": process_data
+            'func': _process_data,
+            'kwargs': {
+                'model': Fund,
+                'natural_key': 'name'
+            }
         },
         UploadForm.MODEL_PROSPECT: {
-            "model": Prospect,
-            "func": process_data
+            'func': _process_data,
+            'kwargs': {
+                'model': Prospect,
+                'natural_key': 'nric'
+            }
         }
     }
     try:
         result = lookup[model_string]
-        return result['model'], result['func']
+        result['func'](data, **result['kwargs'])
     except KeyError:
         # Upload is not implemented for this model
         ccall_log.error('Cannot upload %s data', model_string)
 
 
-def process_user_data(model, data):
+def _process_user_data(data, model):
     """Process data for the User model."""
     for obj in data:
         try:
@@ -69,14 +77,25 @@ def process_user_data(model, data):
             ccall_log.error('(%s) %s', str(exc_), obj)
 
 
-def process_data(model, data):
-    """Process data for other models."""
+def _process_data(data, model, natural_key):
+    """Process data for models that implement get_by_natural_key()."""
     for obj in data:
         try:
-            _, created = model.objects.update_or_create(**obj)
-            if created:
+            natural_value = obj[natural_key]
+            try:
+                model_obj = model.objects.get_by_natural_key(natural_value)
+                # update obj
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != str(getattr(model_obj, attr)):
+                        setattr(model_obj, attr, value)
+                        update_obj[attr] = value
+                model_obj.save()
+                ccall_log.debug('Updated %s object %s: %s',
+                                model.__name__, natural_value, update_obj)
+            except ObjectDoesNotExist:
+                # create new obj
+                model_obj = model.objects.create(**obj)
                 ccall_log.debug('Created %s object: %s', model.__name__, obj)
-            else:
-                ccall_log.debug('Updated %s object: %s', model.__name__, obj)
         except BaseException as exc_:
             ccall_log.error('%s: %s', str(exc_), obj)

@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm
-from .upload import get_model_func
+from .upload import upload_data
 
 
 def test_user_manager_and_above(user):
@@ -43,9 +43,9 @@ def upload(request):
             csv_file.seek(0)
             data = csv.DictReader(StringIO(csv_file.read().decode('utf-8')))
 
-            # process data
-            model, _func = get_model_func(form.cleaned_data['model'])
-            _func(model, data)
+            # upload data
+            upload_data(data, form.cleaned_data['model'])
+
             return HttpResponseRedirect('/admin/')
         else:
             return render(request, 'admin/upload.html',
