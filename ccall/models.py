@@ -3,10 +3,15 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+
+ccall_log = logging.getLogger('ccall')
 
 
 class PhonathonUser(AbstractUser):
@@ -33,6 +38,29 @@ class ProspectManager(models.Manager):
 
     def get_by_natural_key(self, nric):
         return self.get(nric=nric)
+
+    def from_upload(self, data):
+        """Process data from Prospect upload."""
+        for obj in data:
+            try:
+                natural_value = obj['nric']
+                try:
+                    model_obj = self.get_by_natural_key(natural_value)
+                    # update obj
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != str(getattr(model_obj, attr)):
+                            setattr(model_obj, attr, value)
+                            update_obj[attr] = value
+                    model_obj.save()
+                    ccall_log.debug('Updated Prospect object %s: %s',
+                                    natural_value, update_obj)
+                except ObjectDoesNotExist:
+                    # create new obj
+                    model_obj = self.create(**obj)
+                    ccall_log.debug('Created Prospect object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.error('%s: %s', str(exc_), obj)
 
 
 class Prospect(models.Model):
@@ -94,6 +122,29 @@ class FundManager(models.Manager):
 
     def get_by_natural_key(self, name):
         return self.get(name=name)
+
+    def from_upload(self, data):
+        """Process data from Fund upload."""
+        for obj in data:
+            try:
+                natural_value = obj['name']
+                try:
+                    model_obj = self.get_by_natural_key(natural_value)
+                    # update obj
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != str(getattr(model_obj, attr)):
+                            setattr(model_obj, attr, value)
+                            update_obj[attr] = value
+                    model_obj.save()
+                    ccall_log.debug('Updated Fund object %s: %s',
+                                    natural_value, update_obj)
+                except ObjectDoesNotExist:
+                    # create new obj
+                    model_obj = self.create(**obj)
+                    ccall_log.debug('Created Fund object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.error('%s: %s', str(exc_), obj)
 
 
 class Fund(models.Model):
