@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -14,8 +14,42 @@ from django.utils import timezone
 ccall_log = logging.getLogger('ccall')
 
 
+class PhonathonUserManager(UserManager):
+    """Custom manager for model PhonathonUser."""
+
+    def from_upload(self, data):
+        """Process data from User upload."""
+        for obj in data:
+            try:
+                # default password = username if not exist
+                username = obj['username']
+                if 'password' not in obj or not obj['password']:
+                    obj['password'] = username
+                try:
+                    user_obj = self.get_by_natural_key(username)
+                    # update user
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != getattr(user_obj, attr):
+                            setattr(user_obj, attr, value)
+                            update_obj[attr] = value
+                    # manually set password
+                    user_obj.set_password(obj['password'])
+                    user_obj.save()
+                    ccall_log.debug('Updated PhonathonUser object %s: %s',
+                                    username, update_obj)
+                except ObjectDoesNotExist:
+                    # create new user
+                    user_obj = self.create_user(**obj)
+                    ccall_log.debug('Created PhonathonUser object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.error('(%s) %s', str(exc_), obj)
+
+
 class PhonathonUser(AbstractUser):
     """Model for a User."""
+    objects = PhonathonUserManager()
+
     username = models.CharField(max_length=15, unique=True)
     name = models.CharField(
         max_length=50, verbose_name='Full name', blank=False)
