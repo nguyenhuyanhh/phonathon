@@ -8,7 +8,7 @@ import logging
 from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import UploadForm
-from .models import (Fund, PhonathonUser, Prospect)
+from .models import Fund, PhonathonUser, Pledge, Prospect
 
 ccall_log = logging.getLogger('ccall')
 
@@ -37,6 +37,12 @@ def upload_data(data, model_string):
             'kwargs': {
                 'model': Prospect,
                 'natural_key': 'nric'
+            }
+        },
+        UploadForm.MODEL_PROSPECT: {
+            'func': _process_data,
+            'kwargs': {
+                'model': Pledge,
             }
         }
     }

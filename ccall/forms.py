@@ -11,10 +11,12 @@ class UploadForm(forms.Form):
     MODEL_USER = 'Caller'
     MODEL_FUND = 'Fund'
     MODEL_PROSPECT = 'Prospect'
+    MODEL_PLEDGE = 'Pledge'
     MODELS = (
         (MODEL_USER, MODEL_USER),
         (MODEL_FUND, MODEL_FUND),
         (MODEL_PROSPECT, MODEL_PROSPECT),
+        (MODEL_PLEDGE, MODEL_PLEDGE),
     )
     model = forms.ChoiceField(label='Data type', choices=MODELS)
     uploaded_file = forms.FileField(
