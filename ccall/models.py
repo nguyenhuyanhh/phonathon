@@ -46,7 +46,7 @@ class PhonathonUserManager(UserManager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered during processing: %s', obj)
 
 
 class PhonathonUser(AbstractUser):
@@ -99,7 +99,7 @@ class ProspectManager(models.Manager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered during processing: %s', obj)
 
 
 class Prospect(models.Model):
@@ -185,7 +185,7 @@ class FundManager(models.Manager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered during processing: %s', obj)
 
 
 class Fund(models.Model):
