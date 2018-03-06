@@ -3,13 +3,32 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm
-from .upload import upload_data
+from .models import Fund, PhonathonUser, Pledge, Prospect
+
+ccall_log = logging.getLogger('ccall')
+
+
+def upload_data(data, model_string):
+    """Parse the model choice to a Model class and process the data."""
+    lookup = {
+        UploadForm.MODEL_USER: PhonathonUser,
+        UploadForm.MODEL_FUND: Fund,
+        UploadForm.MODEL_PROSPECT: Prospect,
+        UploadForm.MODEL_PLEDGE: Pledge,
+    }
+    try:
+        lookup[model_string].objects.from_upload(data)
+    except KeyError:
+        # Upload is not implemented for this model
+        ccall_log.error('Cannot upload %s data', model_string)
 
 
 def test_user_manager_and_above(user):

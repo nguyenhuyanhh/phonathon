@@ -3,14 +3,56 @@
 
 from __future__ import unicode_literals
 
-from django.contrib.auth.models import AbstractUser
+from datetime import datetime
+import logging
+
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
+ccall_log = logging.getLogger('ccall')
+
+
+class PhonathonUserManager(UserManager):
+    """Custom manager for model PhonathonUser."""
+
+    def from_upload(self, data):
+        """Process data from User upload."""
+        for obj in data:
+            try:
+                # default password = username if not exist
+                username = obj['username']
+                if 'password' not in obj or not obj['password']:
+                    obj['password'] = username
+                try:
+                    user_obj = self.get_by_natural_key(username)
+                    # update user
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != getattr(user_obj, attr):
+                            setattr(user_obj, attr, value)
+                            update_obj[attr] = value
+                    # manually set password
+                    user_obj.set_password(obj['password'])
+                    user_obj.save()
+                    ccall_log.debug('Updated PhonathonUser object %s: %s',
+                                    username, update_obj)
+                except ObjectDoesNotExist:
+                    # create new user
+                    user_obj = self.create_user(**obj)
+                    ccall_log.debug('Created PhonathonUser object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
+
 
 class PhonathonUser(AbstractUser):
     """Model for a User."""
+    objects = PhonathonUserManager()
+
     username = models.CharField(max_length=15, unique=True)
     name = models.CharField(
         max_length=50, verbose_name='Full name', blank=False)
@@ -33,6 +75,31 @@ class ProspectManager(models.Manager):
 
     def get_by_natural_key(self, nric):
         return self.get(nric=nric)
+
+    def from_upload(self, data):
+        """Process data from Prospect upload."""
+        for obj in data:
+            try:
+                natural_value = obj['nric']
+                try:
+                    model_obj = self.get_by_natural_key(natural_value)
+                    # update obj
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != str(getattr(model_obj, attr)):
+                            setattr(model_obj, attr, value)
+                            update_obj[attr] = value
+                    model_obj.save()
+                    ccall_log.debug('Updated Prospect object %s: %s',
+                                    natural_value, update_obj)
+                except ObjectDoesNotExist:
+                    # create new obj
+                    model_obj = self.create(**obj)
+                    ccall_log.debug('Created Prospect object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
 
 
 class Prospect(models.Model):
@@ -95,6 +162,31 @@ class FundManager(models.Manager):
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
+    def from_upload(self, data):
+        """Process data from Fund upload."""
+        for obj in data:
+            try:
+                natural_value = obj['name']
+                try:
+                    model_obj = self.get_by_natural_key(natural_value)
+                    # update obj
+                    update_obj = {}
+                    for attr, value in obj.items():
+                        if value != str(getattr(model_obj, attr)):
+                            setattr(model_obj, attr, value)
+                            update_obj[attr] = value
+                    model_obj.save()
+                    ccall_log.debug('Updated Fund object %s: %s',
+                                    natural_value, update_obj)
+                except ObjectDoesNotExist:
+                    # create new obj
+                    model_obj = self.create(**obj)
+                    ccall_log.debug('Created Fund object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
+
 
 class Fund(models.Model):
     """Model for a Pledge Fund."""
@@ -107,8 +199,38 @@ class Fund(models.Model):
         return self.name
 
 
+class PledgeManager(models.Manager):
+    """Custom manager for model Pledge."""
+
+    def from_upload(self, data):
+        """Process data from Pledge upload."""
+        for obj in data:
+            try:
+                # get the prospect & fund by natural key
+                obj['prospect'] = Prospect.objects.get_by_natural_key(
+                    obj['prospect'])
+                obj['pledge_fund'] = Fund.objects.get_by_natural_key(
+                    obj['pledge_fund'])
+                obj['pledge_date'] = datetime.strptime(
+                    obj['pledge_date'], r'%d/%m/%Y')
+                self.create(**obj)
+                ccall_log.debug('Created Pledge object: %s', obj)
+            except ObjectDoesNotExist:
+                # no prospect/ no fund
+                ccall_log.error(
+                    'Cannot create Pledge object, no Prospect/Fund: %s', obj)
+                continue
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encountered during processing: %s', obj)
+                continue
+
+
 class Pledge(models.Model):
     """Model for a Pledge."""
+    objects = PledgeManager()
+
     pledge_amount = models.DecimalField(
         verbose_name='Pledge amount', decimal_places=2,
         max_digits=12, validators=[MinValueValidator(0)])

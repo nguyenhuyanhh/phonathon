@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..models import (Fund, PhonathonUser, Prospect)
+from ..models import Fund, PhonathonUser, Pledge, Prospect
 from ..views import LoginView, LogoutView, home, upload
 
 
@@ -135,3 +135,17 @@ class TestUploadView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             Prospect.objects.filter(nric__in=['S1234567A']).count(), 1)
+
+    def test_upload_pledge(self):
+        """Test upload a pledge CSV file."""
+        self.test_upload_fund()
+        self.test_upload_prospect()
+        data_file = os.path.join(self.data_dir, 'test_pledge.csv')
+        with open(data_file, 'r') as csv_:
+            response = self.client.post('/admin/upload/',
+                                        {'model': 'Pledge',
+                                         'uploaded_file': csv_},
+                                        follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            Pledge.objects.filter(prospect__nric__in=['S1234567A']).count(), 1)
