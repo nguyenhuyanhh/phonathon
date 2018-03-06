@@ -224,18 +224,24 @@ class PledgeManager(models.Manager):
                     obj['pledge_fund'])
                 obj['pledge_date'] = datetime.strptime(
                     obj['pledge_date'], r'%d/%m/%Y')
-                self.create(**obj)
-                ccall_log.debug('Created Pledge object: %s', obj)
-            except ObjectDoesNotExist:
-                # no prospect/ no fund
+                try:
+                    with transaction.atomic():
+                        self.create(**obj)
+                    ccall_log.debug('Created Pledge object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Pledge object: %s', obj)
+            except Prospect.DoesNotExist:
+                # no prospect
                 ccall_log.error(
-                    'Cannot create Pledge object, no Prospect/Fund: %s', obj)
-                continue
+                    'Cannot create Pledge object, no Prospect: %s', obj)
+            except Fund.DoesNotExist:
+                # no fund
+                ccall_log.error(
+                    'Cannot create Pledge object, no Fund: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
                     'Exception encountered during processing: %s', obj)
-                continue
 
 
 class Pledge(models.Model):
