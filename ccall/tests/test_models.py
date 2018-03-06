@@ -117,13 +117,13 @@ class TestPhonathonUser(TestCase):
         self.assertEqual(PhonathonUser.objects.get_by_natural_key(
             'AlexA').name, 'Alex Au')
 
-    def test_from_upload_multiple(self):
+    def test_from_upload_multiple_user(self):
         """Test adding/ updating multiple users via custom manager."""
         PhonathonUser.objects.from_upload(
             [self.user_obj_add, self.user_obj_upd])
         self.assertEqual(PhonathonUser.objects.count(), 3)
 
-    def test_from_upload_multiple_with_errors(self):
+    def test_from_upload_multiple_user_with_errors(self):
         """Test adding/ updating multiple users, with errors."""
         PhonathonUser.objects.from_upload(
             [self.user_obj_err, self.user_obj_add])
@@ -194,3 +194,34 @@ class TestProspect(TestCase):
         Prospect.objects.from_upload(
             [self.prospect_obj_err, self.prospect_obj_add])
         self.assertEqual(Prospect.objects.count(), 2)
+
+
+class TestFund(TestCase):
+    """Test cases for Fund."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.fund_obj_add_1 = {
+            'name': 'NTU Bursaries'
+        }
+        cls.fund_obj_add_2 = {
+            'name': 'NTU Student Life Activities Fund'
+        }
+        cls.fund_obj_err = {
+            'hello': 'world'
+        }
+
+    def test_from_upload_add_fund(self):
+        """Test adding Fund via custom manager's from_upload()."""
+        Fund.objects.from_upload([self.fund_obj_add_1])
+        self.assertEqual(Fund.objects.count(), 1)
+
+    def test_from_upload_multiple_fund(self):
+        """Test adding multiple Funds via custom manager."""
+        Fund.objects.from_upload([self.fund_obj_add_1, self.fund_obj_add_2])
+        self.assertEqual(Fund.objects.count(), 2)
+
+    def test_from_upload_multiple_fund_with_errors(self):
+        """Test adding multiple Funds, with errors."""
+        Fund.objects.from_upload([self.fund_obj_err, self.fund_obj_add_1])
+        self.assertEqual(Fund.objects.count(), 1)
