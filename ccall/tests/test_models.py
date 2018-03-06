@@ -128,3 +128,69 @@ class TestPhonathonUser(TestCase):
         PhonathonUser.objects.from_upload(
             [self.user_obj_err, self.user_obj_add])
         self.assertEqual(PhonathonUser.objects.count(), 3)
+
+
+class TestProspect(TestCase):
+    """Test cases for Prospect."""
+
+    @classmethod
+    def setUpTestData(cls):
+        prospect_obj = {
+            'nric': 'S1234567A',
+            'salutation': 'Ms',
+            'name': 'Anna Low',
+            'gender': 'F',
+            'education_school': 'School of Humanities',
+            'education_degree': 'B.A (Econs)',
+            'education_year': '2017'
+        }
+        Prospect.objects.create(**prospect_obj)
+        cls.prospect_obj_add = {
+            'nric': 'S1111111A',
+            'salutation': 'Mr',
+            'name': 'Alex Ang',
+            'gender': 'M',
+            'education_school': 'Nanyang Business School',
+            'education_degree': 'B.BUS',
+            'education_year': '2017'
+        }
+        cls.prospect_obj_upd = {
+            'nric': 'S1234567A',
+            'salutation': 'Ms',
+            'name': 'Anna Low',
+            'gender': 'F',
+            'education_school': 'School of Humanities',
+            'education_degree': 'B.A (Econs)',
+            'education_year': '2016'
+        }
+        cls.prospect_obj_err = {
+            'nric': 'S1111112A',
+            'salutation': 'Mr',
+            'name': 'Alex Ang',
+            'gender': 'M'
+        }
+
+    def test_from_upload_new_prospect(self):
+        """Test adding new Prospect via custom manager's from_upload()."""
+        Prospect.objects.from_upload([self.prospect_obj_add])
+        # check for 2 prospect - 1 from test class and 1 from test case
+        self.assertEqual(Prospect.objects.count(), 2)
+
+    def test_from_upload_update_prospect(self):
+        """Test updating Prospect via custom manager."""
+        Prospect.objects.from_upload([self.prospect_obj_upd])
+        self.assertEqual(Prospect.objects.count(), 1)
+        self.assertEqual(Prospect.objects.get_by_natural_key(
+            'S1234567A').education_year, 2016)
+
+    def test_from_upload_multiple_prospect(self):
+        """Test adding/ updating multiple Prospects via custom manager."""
+        Prospect.objects.from_upload(
+            [self.prospect_obj_add, self.prospect_obj_upd])
+        self.assertEqual(Prospect.objects.count(), 2)
+
+    def test_from_upload_multiple_prospect_with_errors(self):
+        """Test adding/ updating multiple Prospects with errors."""
+        Prospect.objects.from_upload(
+            [self.prospect_obj_err, self.prospect_obj_add])
+        self.assertEqual(Prospect.objects.count(), 2)
