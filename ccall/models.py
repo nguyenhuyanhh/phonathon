@@ -3,13 +3,13 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
 ccall_log = logging.getLogger('ccall')
@@ -26,23 +26,28 @@ class PhonathonUserManager(UserManager):
                 username = obj['username']
                 if 'password' not in obj or not obj['password']:
                     obj['password'] = username
+                user_obj = self.get_by_natural_key(username)
+                # update user
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != getattr(user_obj, attr):
+                        setattr(user_obj, attr, value)
+                        update_obj[attr] = value
+                # manually set password
+                user_obj.set_password(obj['password'])
+                user_obj.save()
+                ccall_log.debug('Updated PhonathonUser object %s: %s',
+                                username, update_obj)
+            except ObjectDoesNotExist:
+                # create new user
                 try:
-                    user_obj = self.get_by_natural_key(username)
-                    # update user
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != getattr(user_obj, attr):
-                            setattr(user_obj, attr, value)
-                            update_obj[attr] = value
-                    # manually set password
-                    user_obj.set_password(obj['password'])
-                    user_obj.save()
-                    ccall_log.debug('Updated PhonathonUser object %s: %s',
-                                    username, update_obj)
-                except ObjectDoesNotExist:
-                    # create new user
-                    user_obj = self.create_user(**obj)
-                    ccall_log.debug('Created PhonathonUser object: %s', obj)
+                    with transaction.atomic():
+                        user_obj = self.create_user(**obj)
+                        ccall_log.debug(
+                            'Created PhonathonUser object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error(
+                        'Cannot create PhonathonUser object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
@@ -81,21 +86,24 @@ class ProspectManager(models.Manager):
         for obj in data:
             try:
                 natural_value = obj['nric']
+                model_obj = self.get_by_natural_key(natural_value)
+                # update prospect
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != str(getattr(model_obj, attr)):
+                        setattr(model_obj, attr, value)
+                        update_obj[attr] = value
+                model_obj.save()
+                ccall_log.debug('Updated Prospect object %s: %s',
+                                natural_value, update_obj)
+            except ObjectDoesNotExist:
+                # create new prospect
                 try:
-                    model_obj = self.get_by_natural_key(natural_value)
-                    # update obj
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != str(getattr(model_obj, attr)):
-                            setattr(model_obj, attr, value)
-                            update_obj[attr] = value
-                    model_obj.save()
-                    ccall_log.debug('Updated Prospect object %s: %s',
-                                    natural_value, update_obj)
-                except ObjectDoesNotExist:
-                    # create new obj
-                    model_obj = self.create(**obj)
+                    with transaction.atomic():
+                        model_obj = self.create(**obj)
                     ccall_log.debug('Created Prospect object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Prospect object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
@@ -167,21 +175,24 @@ class FundManager(models.Manager):
         for obj in data:
             try:
                 natural_value = obj['name']
+                model_obj = self.get_by_natural_key(natural_value)
+                # update obj
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != str(getattr(model_obj, attr)):
+                        setattr(model_obj, attr, value)
+                        update_obj[attr] = value
+                model_obj.save()
+                ccall_log.debug('Updated Fund object %s: %s',
+                                natural_value, update_obj)
+            except ObjectDoesNotExist:
+                # create new obj
                 try:
-                    model_obj = self.get_by_natural_key(natural_value)
-                    # update obj
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != str(getattr(model_obj, attr)):
-                            setattr(model_obj, attr, value)
-                            update_obj[attr] = value
-                    model_obj.save()
-                    ccall_log.debug('Updated Fund object %s: %s',
-                                    natural_value, update_obj)
-                except ObjectDoesNotExist:
-                    # create new obj
-                    model_obj = self.create(**obj)
+                    with transaction.atomic():
+                        model_obj = self.create(**obj)
                     ccall_log.debug('Created Fund object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Fund object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
