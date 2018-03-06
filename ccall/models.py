@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
 import logging
 
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -198,8 +199,38 @@ class Fund(models.Model):
         return self.name
 
 
+class PledgeManager(models.Manager):
+    """Custom manager for model Pledge."""
+
+    def from_upload(self, data):
+        """Process data from Pledge upload."""
+        for obj in data:
+            try:
+                # get the prospect & fund by natural key
+                obj['prospect'] = Prospect.objects.get_by_natural_key(
+                    obj['prospect'])
+                obj['pledge_fund'] = Fund.objects.get_by_natural_key(
+                    obj['pledge_fund'])
+                obj['pledge_date'] = datetime.strptime(
+                    obj['pledge_date'], r'%d/%m/%Y')
+                self.create(**obj)
+                ccall_log.debug('Created Pledge object: %s', obj)
+            except ObjectDoesNotExist:
+                # no prospect/ no fund
+                ccall_log.error(
+                    'Cannot create Pledge object, no Prospect/Fund: %s', obj)
+                continue
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encountered during processing: %s', obj)
+                continue
+
+
 class Pledge(models.Model):
     """Model for a Pledge."""
+    objects = PledgeManager()
+
     pledge_amount = models.DecimalField(
         verbose_name='Pledge amount', decimal_places=2,
         max_digits=12, validators=[MinValueValidator(0)])
