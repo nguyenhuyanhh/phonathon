@@ -69,6 +69,15 @@ class TestPhonathonUser(TestCase):
     def setUpTestData(cls):
         cls.test_user = PhonathonUser(username='AlexA', name='Alex Ang')
         cls.test_user.save()
+        cls.user_obj1 = {
+            'username': 'Test1',
+            'password': 'Test1',
+            'name': 'Test User 1'
+        }
+        cls.user_obj2 = {
+            'username': 'AlexA',
+            'name': 'Alex Au'
+        }
 
     def test_manager_and_above_manager(self):
         """Test the attribute is_manager_and_above for Managers."""
@@ -83,3 +92,29 @@ class TestPhonathonUser(TestCase):
     def test_manager_and_above_other(self):
         """Test the attribute is_manager_and_above for other users."""
         self.assertFalse(self.test_user.is_manager_and_above)
+
+    def test_from_upload_new_user(self):
+        """Test adding new user via custom manager's from_upload()."""
+        PhonathonUser.objects.from_upload([self.user_obj1])
+        # check for 3 users: default admin + test class' + test case'
+        self.assertEqual(PhonathonUser.objects.count(), 3)
+
+    def test_from_upload_new_user_no_password(self):
+        """Test adding new user via custom manager, with no password."""
+        user_obj = self.user_obj1.copy()
+        del user_obj['password']
+        PhonathonUser.objects.from_upload([user_obj])
+        self.assertTrue(PhonathonUser.objects.get_by_natural_key(
+            'Test1').check_password('Test1'))
+
+    def test_from_upload_update_user(self):
+        """Test updating user via custom manager."""
+        PhonathonUser.objects.from_upload([self.user_obj2])
+        self.assertEqual(PhonathonUser.objects.count(), 2)
+        self.assertEqual(PhonathonUser.objects.get_by_natural_key(
+            'AlexA').name, 'Alex Au')
+
+    def test_from_upload_multiple(self):
+        """Test adding/ updating multiple users via custom manager."""
+        PhonathonUser.objects.from_upload([self.user_obj1, self.user_obj2])
+        self.assertEqual(PhonathonUser.objects.count(), 3)
