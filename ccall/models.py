@@ -43,7 +43,9 @@ class PhonathonUserManager(UserManager):
                     user_obj = self.create_user(**obj)
                     ccall_log.debug('Created PhonathonUser object: %s', obj)
             except BaseException as exc_:
-                ccall_log.error('(%s) %s', str(exc_), obj)
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
 
 
 class PhonathonUser(AbstractUser):
@@ -94,7 +96,9 @@ class ProspectManager(models.Manager):
                     model_obj = self.create(**obj)
                     ccall_log.debug('Created Prospect object: %s', obj)
             except BaseException as exc_:
-                ccall_log.error('%s: %s', str(exc_), obj)
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
 
 
 class Prospect(models.Model):
@@ -178,7 +182,9 @@ class FundManager(models.Manager):
                     model_obj = self.create(**obj)
                     ccall_log.debug('Created Fund object: %s', obj)
             except BaseException as exc_:
-                ccall_log.error('%s: %s', str(exc_), obj)
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encoutered during processing: %s', obj)
 
 
 class Fund(models.Model):
