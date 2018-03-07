@@ -163,6 +163,9 @@ class Prospect(models.Model):
     def __str__(self):
         return '{} ({})'.format(self.name, self.nric)
 
+    def natural_key(self):
+        return self.nric
+
 
 class FundManager(models.Manager):
     """Custom manager for model Fund."""
@@ -207,6 +210,9 @@ class Fund(models.Model):
                             max_length=50, unique=True)
 
     def __str__(self):
+        return self.name
+
+    def natural_key(self):
         return self.name
 
 
