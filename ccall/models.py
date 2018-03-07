@@ -281,13 +281,17 @@ class Pool(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, verbose_name='Project')
     max_attempts = models.PositiveSmallIntegerField(
-        verbose_name='Maximum number of attempts')
+        verbose_name='Maximum number of attempts', default=0)
     prospects = models.ManyToManyField(
         to=Prospect, related_name='prospect_set',
         related_query_name='prospects', verbose_name='Prospects', blank=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_active(self):
+        return bool(self.max_attempts)
 
 
 class ResultCode(models.Model):
