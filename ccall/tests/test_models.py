@@ -225,3 +225,55 @@ class TestFund(TestCase):
         """Test adding multiple Funds, with errors."""
         Fund.objects.from_upload([self.fund_obj_err, self.fund_obj_add_1])
         self.assertEqual(Fund.objects.count(), 1)
+
+
+class TestPledge(TestCase):
+    """Test cases for Pledge."""
+
+    @classmethod
+    def setUpTestData(cls):
+        prospect_obj = {
+            'nric': 'S1234567A',
+            'salutation': 'Ms',
+            'name': 'Anna Low',
+            'gender': 'F',
+            'education_school': 'School of Humanities',
+            'education_degree': 'B.A (Econs)',
+            'education_year': '2017'
+        }
+        Prospect.objects.create(**prospect_obj)
+        Fund.objects.create(name='NTU Bursaries')
+        cls.pledge_obj_add_1 = {
+            'prospect': 'S1234567A',
+            'pledge_amount': '50',
+            'pledge_fund': 'NTU Bursaries',
+            'pledge_date': '01/03/2017'
+        }
+        cls.pledge_obj_add_2 = {
+            'prospect': 'S1234567A',
+            'pledge_amount': '100',
+            'pledge_fund': 'NTU Bursaries',
+            'pledge_date': '01/03/2016'
+        }
+        cls.pledge_obj_err = {
+            'prospect': 'S1234567A',
+            'pledge_amount': '100',
+            'pledge_fund': 'NTU Bursaries',
+        }
+
+    def test_from_upload_add_pledge(self):
+        """Test adding Pledge via custom manager's from_upload()."""
+        Pledge.objects.from_upload([self.pledge_obj_add_1])
+        self.assertEqual(Pledge.objects.count(), 1)
+
+    def test_from_upload_multiple_pledge(self):
+        """Test adding multiple Pledges via custom manager."""
+        Pledge.objects.from_upload(
+            [self.pledge_obj_add_1, self.pledge_obj_add_2])
+        self.assertEqual(Pledge.objects.count(), 2)
+
+    def test_from_upload_multiple_pledge_error(self):
+        """Test adding multiple Pledges, with errors."""
+        Pledge.objects.from_upload(
+            [self.pledge_obj_err, self.pledge_obj_add_1])
+        self.assertEqual(Pledge.objects.count(), 1)
