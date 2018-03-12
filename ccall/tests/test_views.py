@@ -109,8 +109,7 @@ class TestUploadView(TestCase):
                                          'uploaded_file': csv_},
                                         follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            PhonathonUser.objects.filter(username__in=['Test1']).count(), 1)
+        self.assertTrue(PhonathonUser.objects.get(username='Test1'))
 
     def test_upload_fund(self):
         """Test upload a fund CSV file."""
@@ -121,8 +120,7 @@ class TestUploadView(TestCase):
                                          'uploaded_file': csv_},
                                         follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            Fund.objects.filter(name__in=['NTU Bursaries']).count(), 1)
+        self.assertTrue(Fund.objects.get(name='NTU Bursaries'))
 
     def test_upload_prospect(self):
         """Test upload a fund CSV file."""
@@ -133,8 +131,7 @@ class TestUploadView(TestCase):
                                          'uploaded_file': csv_},
                                         follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            Prospect.objects.filter(nric__in=['S1234567A']).count(), 1)
+        self.assertTrue(Prospect.objects.get(nric='S1234567A'))
 
     def test_upload_pledge(self):
         """Test upload a pledge CSV file."""
@@ -147,5 +144,4 @@ class TestUploadView(TestCase):
                                          'uploaded_file': csv_},
                                         follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            Pledge.objects.filter(prospect__nric__in=['S1234567A']).count(), 1)
+        self.assertTrue(Pledge.objects.get(prospect__nric='S1234567A'))
