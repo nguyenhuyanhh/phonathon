@@ -5,9 +5,11 @@ from __future__ import unicode_literals
 
 from django import forms
 
+from .models import Pool
+
 
 class UploadForm(forms.Form):
-    """Form to upload a CSV file."""
+    """Form to handle Caller/Fund/Prospect/Pledge CSV data uploads."""
     MODEL_USER = 'Caller'
     MODEL_FUND = 'Fund'
     MODEL_PROSPECT = 'Prospect'
@@ -21,3 +23,14 @@ class UploadForm(forms.Form):
     model = forms.ChoiceField(label='Data type', choices=MODELS)
     uploaded_file = forms.FileField(
         label='Upload file', allow_empty_file=False)
+
+
+class UploadPoolForm(forms.ModelForm):
+    """Form to handle Pool CSV data uploads."""
+
+    uploaded_file = forms.FileField(
+        label='Upload file', allow_empty_file=False)
+
+    class Meta:
+        model = Pool
+        exclude = ('prospects', 'max_attempts',)
