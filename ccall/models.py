@@ -83,6 +83,8 @@ class ProspectManager(models.Manager):
 
     def from_upload(self, data):
         """Process data from Prospect upload."""
+        created = []
+        updated = []
         for obj in data:
             try:
                 natural_value = obj['nric']
@@ -94,6 +96,7 @@ class ProspectManager(models.Manager):
                         setattr(model_obj, attr, value)
                         update_obj[attr] = value
                 model_obj.save()
+                updated.append(model_obj)
                 ccall_log.debug('Updated Prospect object %s: %s',
                                 natural_value, update_obj)
             except ObjectDoesNotExist:
@@ -101,6 +104,7 @@ class ProspectManager(models.Manager):
                 try:
                     with transaction.atomic():
                         model_obj = self.create(**obj)
+                    created.append(model_obj)
                     ccall_log.debug('Created Prospect object: %s', obj)
                 except IntegrityError:
                     ccall_log.error('Cannot create Prospect object: %s', obj)
@@ -108,6 +112,7 @@ class ProspectManager(models.Manager):
                 ccall_log.exception(exc_)
                 ccall_log.error(
                     'Exception encountered during processing: %s', obj)
+        return created, updated
 
 
 class Prospect(models.Model):

@@ -172,28 +172,38 @@ class TestProspect(TestCase):
 
     def test_from_upload_new_prospect(self):
         """Test adding new Prospect via custom manager's from_upload()."""
-        Prospect.objects.from_upload([self.prospect_obj_add])
+        created, updated = Prospect.objects.from_upload(
+            [self.prospect_obj_add])
         # check for 2 prospect - 1 from test class and 1 from test case
         self.assertEqual(Prospect.objects.count(), 2)
+        self.assertEqual(len(created), 1)
+        self.assertEqual(len(updated), 0)
 
     def test_from_upload_update_prospect(self):
         """Test updating Prospect via custom manager."""
-        Prospect.objects.from_upload([self.prospect_obj_upd])
+        created, updated = Prospect.objects.from_upload(
+            [self.prospect_obj_upd])
         self.assertEqual(Prospect.objects.count(), 1)
         self.assertEqual(Prospect.objects.get_by_natural_key(
             'S1234567A').education_year, 2016)
+        self.assertEqual(len(created), 0)
+        self.assertEqual(len(updated), 1)
 
     def test_from_upload_multiple_prospect(self):
         """Test adding/ updating multiple Prospects via custom manager."""
-        Prospect.objects.from_upload(
+        created, updated = Prospect.objects.from_upload(
             [self.prospect_obj_add, self.prospect_obj_upd])
         self.assertEqual(Prospect.objects.count(), 2)
+        self.assertEqual(len(created), 1)
+        self.assertEqual(len(updated), 1)
 
     def test_from_upload_multiple_prospect_with_errors(self):
         """Test adding/ updating multiple Prospects with errors."""
-        Prospect.objects.from_upload(
+        created, updated = Prospect.objects.from_upload(
             [self.prospect_obj_err, self.prospect_obj_add])
         self.assertEqual(Prospect.objects.count(), 2)
+        self.assertEqual(len(created), 1)
+        self.assertEqual(len(updated), 0)
 
 
 class TestFund(TestCase):
