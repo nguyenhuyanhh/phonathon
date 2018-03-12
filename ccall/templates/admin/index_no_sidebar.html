@@ -9,7 +9,13 @@
         </caption>
         {% if user.is_manager_and_above %}
         <tr>
-            <th scope="row"><a href="{% url 'upload' %}">Upload data</a></th>
+            <th scope="row"><a href="{% url 'upload' %}">Upload Caller/ Fund/ Prospect/ Pledge data</a></th>
+            <td></td>
+        </tr>
+        {% endif %}
+        {% if user.is_manager_and_above %}
+        <tr>
+            <th scope="row"><a href="{% url 'upload_pool' %}">Upload Pool data</a></th>
             <td></td>
         </tr>
         {% endif %}
