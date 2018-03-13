@@ -280,8 +280,36 @@ class Project(models.Model):
         return self.name
 
 
+class PoolManager(models.Manager):
+    """Custom manager for model Pool."""
+
+    def get_by_natural_key(self, project, name):
+        return self.get(project=project, name=name)
+
+    def from_upload(self, project, name, data):
+        """Process data from Pool upload."""
+        try:
+            # get the pool by natural key
+            pool_obj = self.get_by_natural_key(project, name)
+            created, updated = Prospect.objects.from_upload(data)
+            pool_obj.prospects.add(*(created + updated))
+            ccall_log.debug('Updated Pool object %s', name)
+        except Pool.DoesNotExist:
+            # create the pool
+            pool_obj = self.create(project=project, name=name)
+            created, updated = Prospect.objects.from_upload(data)
+            pool_obj.prospects.add(*(created + updated))
+            ccall_log.debug('Created Pool object %s', name)
+        except BaseException as exc_:
+            ccall_log.exception(exc_)
+            ccall_log.error(
+                'Exception encountered during processing Pool: %s', name)
+
+
 class Pool(models.Model):
     """Model for a Pool."""
+    objects = PoolManager()
+
     name = models.CharField(max_length=50, verbose_name='Pool name')
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, verbose_name='Project')
@@ -297,6 +325,9 @@ class Pool(models.Model):
     @property
     def is_active(self):
         return bool(self.max_attempts)
+
+    def natural_key(self):
+        return (self.project, self.name,)
 
 
 class ResultCode(models.Model):
