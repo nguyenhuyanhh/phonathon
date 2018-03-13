@@ -10,8 +10,8 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..models import Fund, PhonathonUser, Pledge, Prospect
-from ..views import LoginView, LogoutView, home, upload
+from ..models import Fund, PhonathonUser, Pledge, Pool, Project, Prospect
+from ..views import LoginView, LogoutView, home, upload, upload_pool
 
 
 class TestResolveURLs(TestCase):
@@ -41,6 +41,11 @@ class TestResolveURLs(TestCase):
         """Test whether /admin/upload resolves to upload view."""
         view = resolve('/admin/upload/')
         self.assertEqual(view.func, upload)
+
+    def test_resolve_url_upload_pool(self):
+        """Test whether /admin/upload_pool resolves to upload_pool view."""
+        view = resolve('/admin/upload_pool/')
+        self.assertEqual(view.func, upload_pool)
 
 
 class TestLoginLogout(TestCase):
@@ -145,3 +150,18 @@ class TestUploadView(TestCase):
                                         follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(Pledge.objects.get(prospect__nric='S1234567A'))
+
+    def test_upload_pool(self):
+        """Test upload a pool CSV file."""
+        project_obj = Project.objects.create(name='Test Project')
+        data_file = os.path.join(self.data_dir, 'test_prospect.csv')
+        with open(data_file, 'r') as csv_:
+            response = self.client.post('/admin/upload_pool/',
+                                        {'name': 'Test Pool',
+                                         'project': project_obj.id,
+                                         'uploaded_file': csv_},
+                                        follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Pool.objects.get(name='Test Pool'))
+        self.assertEqual(Pool.objects.get(
+            name='Test Pool').prospects.count(), 1)
