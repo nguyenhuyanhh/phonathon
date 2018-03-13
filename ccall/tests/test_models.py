@@ -97,7 +97,7 @@ class TestPhonathonUser(TestCase):
         self.assertFalse(self.test_user.is_manager_and_above)
 
     def test_from_upload_new_user(self):
-        """Test adding new user via custom manager's from_upload()."""
+        """Test adding new user via custom manager."""
         PhonathonUser.objects.from_upload([self.user_obj_add])
         # check for 3 users: default admin + test class' + test case'
         self.assertEqual(PhonathonUser.objects.count(), 3)
@@ -171,7 +171,7 @@ class TestProspect(TestCase):
         }
 
     def test_from_upload_new_prospect(self):
-        """Test adding new Prospect via custom manager's from_upload()."""
+        """Test adding new Prospect via custom manager."""
         created, updated = Prospect.objects.from_upload(
             [self.prospect_obj_add])
         # check for 2 prospect - 1 from test class and 1 from test case
@@ -222,7 +222,7 @@ class TestFund(TestCase):
         }
 
     def test_from_upload_add_fund(self):
-        """Test adding Fund via custom manager's from_upload()."""
+        """Test adding Fund via custom manager."""
         Fund.objects.from_upload([self.fund_obj_add_1])
         self.assertEqual(Fund.objects.count(), 1)
 
@@ -272,7 +272,7 @@ class TestPledge(TestCase):
         }
 
     def test_from_upload_add_pledge(self):
-        """Test adding Pledge via custom manager's from_upload()."""
+        """Test adding Pledge via custom manager."""
         Pledge.objects.from_upload([self.pledge_obj_add_1])
         self.assertEqual(Pledge.objects.count(), 1)
 
@@ -287,3 +287,71 @@ class TestPledge(TestCase):
         Pledge.objects.from_upload(
             [self.pledge_obj_err, self.pledge_obj_add_1])
         self.assertEqual(Pledge.objects.count(), 1)
+
+
+class TestPool(TestCase):
+    """Test cases for Pool."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.prospect_obj_1 = {
+            'nric': 'S1234567A',
+            'salutation': 'Ms',
+            'name': 'Anna Low',
+            'gender': 'F',
+            'education_school': 'School of Humanities',
+            'education_degree': 'B.A (Econs)',
+            'education_year': '2017'
+        }
+        cls.prospect_obj_2 = {
+            'nric': 'S1111111A',
+            'salutation': 'Mr',
+            'name': 'Andy Lau',
+            'gender': 'M',
+            'education_school': 'School of Computer Science and Engineering',
+            'education_degree': 'B.Eng (Computer Science)',
+            'education_year': '2015'
+        }
+        cls.project = Project.objects.create(name='Test Project')
+        cls.test_pool = Pool.objects.create(
+            name='Test Pool', project=cls.project)
+        cls.test_pool.prospects.add(
+            Prospect.objects.create(**cls.prospect_obj_1))
+
+    def test_is_active(self):
+        """Test the attribute is_active."""
+        self.assertFalse(self.test_pool.is_active)
+        self.test_pool.max_attempts = 1
+        self.test_pool.save()
+        self.assertTrue(self.test_pool.is_active)
+
+    def test_from_upload_add_pool(self):
+        """Test adding pool via custom manager."""
+        Pool.objects.from_upload(
+            self.project, 'Test Pool 1', [self.prospect_obj_1])
+        self.assertEqual(Pool.objects.count(), 2)
+        test_pool = Pool.objects.get(name='Test Pool 1')
+        self.assertEqual(test_pool.prospects.count(), 1)
+
+    def test_from_upload_update_pool(self):
+        """Test updating pool via custom manager."""
+        Pool.objects.from_upload(
+            self.project, 'Test Pool', [self.prospect_obj_2])
+        self.assertEqual(Pool.objects.count(), 1)
+        test_pool = Pool.objects.get(name='Test Pool')
+        self.assertEqual(test_pool.prospects.count(), 2)
+
+    def test_from_upload_update_pool_multiple_prospects(self):
+        """Test updating pool with multiple prospects."""
+        Pool.objects.from_upload(
+            self.project, 'Test Pool',
+            [self.prospect_obj_1, self.prospect_obj_2])
+        self.assertEqual(Pool.objects.count(), 1)
+        test_pool = Pool.objects.get(name='Test Pool')
+        self.assertEqual(test_pool.prospects.count(), 2)
+
+    def test_from_upload_invalid_pool(self):
+        """Test adding invalid pool via custom manager."""
+        Pool.objects.from_upload(
+            'Test Project', 'Test Pool 1', [self.prospect_obj_1])
+        self.assertEqual(Pool.objects.count(), 1)
