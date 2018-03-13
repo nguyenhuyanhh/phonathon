@@ -51,7 +51,7 @@ class PhonathonUserManager(UserManager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encountered during processing: %s', obj)
+                    'Exception encountered on PhonathonUser object: %s', obj)
 
 
 class PhonathonUser(AbstractUser):
@@ -111,7 +111,7 @@ class ProspectManager(models.Manager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encountered during processing: %s', obj)
+                    'Exception encountered on Prospect object: %s', obj)
         return created, updated
 
 
@@ -204,7 +204,7 @@ class FundManager(models.Manager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encountered during processing: %s', obj)
+                    'Exception encountered on Fund object: %s', obj)
 
 
 class Fund(models.Model):
@@ -252,7 +252,7 @@ class PledgeManager(models.Manager):
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encountered during processing: %s', obj)
+                    'Exception encountered on Pledge object: %s', obj)
 
 
 class Pledge(models.Model):
@@ -303,7 +303,7 @@ class PoolManager(models.Manager):
         except BaseException as exc_:
             ccall_log.exception(exc_)
             ccall_log.error(
-                'Exception encountered during processing Pool: %s', name)
+                'Exception encountered on Pool object: %s', name)
 
 
 class Pool(models.Model):
