@@ -10,8 +10,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 
-from .forms import UploadForm
-from .models import Fund, PhonathonUser, Pledge, Prospect
+from .forms import UploadForm, UploadPoolForm
+from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
 
 ccall_log = logging.getLogger('ccall')
 
@@ -45,14 +45,15 @@ def home(request):
 @login_required(login_url='login')
 @user_passes_test(test_user_manager_and_above)
 def upload(request):
-    """Upload csv from admin interface."""
+    """Upload Caller/ Fund/ Prospect/ Pledge CSV data from admin interface."""
     import csv
     from io import StringIO
 
     # if GET, render the form
     if request.method == 'GET':
         return render(request, 'admin/upload.html',
-                      {'form': UploadForm, 'title': 'Upload data'})
+                      {'form': UploadForm,
+                       'title': 'Upload Caller/Fund/Prospect/Pledge data'})
     # else process the form
     try:
         form = UploadForm(request.POST, request.FILES)
@@ -68,9 +69,45 @@ def upload(request):
             return HttpResponseRedirect('/admin/')
         else:
             return render(request, 'admin/upload.html',
-                          {'form': UploadForm, 'title': 'Upload data'})
+                          {'form': UploadForm,
+                           'title': 'Upload Caller/Fund/Prospect/Pledge data'})
     except BaseException as exc:
         print(exc)
+
+
+@login_required(login_url='login')
+@user_passes_test(test_user_manager_and_above)
+def upload_pool(request):
+    """Upload Pool CSV data from admin interface."""
+    import csv
+    from io import StringIO
+
+    # if GET, render the form
+    if request.method == 'GET':
+        return render(request, 'admin/upload_pool.html',
+                      {'form': UploadPoolForm,
+                       'title': 'Upload Pool data'})
+    # else process the form
+    try:
+        form = UploadPoolForm(request.POST, request.FILES)
+        if form.is_valid():
+            # get data
+            csv_file = request.FILES['uploaded_file']
+            csv_file.seek(0)
+            data = csv.DictReader(StringIO(csv_file.read().decode('utf-8')))
+
+            # upload data
+            name = form.cleaned_data['name']
+            project = form.cleaned_data['project']
+            Pool.objects.from_upload(project, name, data)
+
+            return HttpResponseRedirect('/admin/')
+        else:
+            return render(request, 'admin/upload_pool.html',
+                          {'form': UploadPoolForm,
+                           'title': 'Upload Pool data'})
+    except BaseException as exc:
+        ccall_log.exception(exc)
 
 
 class LoginView(auth_views.LoginView):

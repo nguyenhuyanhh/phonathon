@@ -3,13 +3,13 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 
 ccall_log = logging.getLogger('ccall')
@@ -26,27 +26,32 @@ class PhonathonUserManager(UserManager):
                 username = obj['username']
                 if 'password' not in obj or not obj['password']:
                     obj['password'] = username
+                user_obj = self.get_by_natural_key(username)
+                # update user
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != getattr(user_obj, attr):
+                        setattr(user_obj, attr, value)
+                        update_obj[attr] = value
+                # manually set password
+                user_obj.set_password(obj['password'])
+                user_obj.save()
+                ccall_log.debug('Updated PhonathonUser object %s: %s',
+                                username, update_obj)
+            except ObjectDoesNotExist:
+                # create new user
                 try:
-                    user_obj = self.get_by_natural_key(username)
-                    # update user
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != getattr(user_obj, attr):
-                            setattr(user_obj, attr, value)
-                            update_obj[attr] = value
-                    # manually set password
-                    user_obj.set_password(obj['password'])
-                    user_obj.save()
-                    ccall_log.debug('Updated PhonathonUser object %s: %s',
-                                    username, update_obj)
-                except ObjectDoesNotExist:
-                    # create new user
-                    user_obj = self.create_user(**obj)
-                    ccall_log.debug('Created PhonathonUser object: %s', obj)
+                    with transaction.atomic():
+                        user_obj = self.create_user(**obj)
+                        ccall_log.debug(
+                            'Created PhonathonUser object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error(
+                        'Cannot create PhonathonUser object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered on PhonathonUser object: %s', obj)
 
 
 class PhonathonUser(AbstractUser):
@@ -78,28 +83,36 @@ class ProspectManager(models.Manager):
 
     def from_upload(self, data):
         """Process data from Prospect upload."""
+        created = []
+        updated = []
         for obj in data:
             try:
                 natural_value = obj['nric']
+                model_obj = self.get_by_natural_key(natural_value)
+                # update prospect
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != str(getattr(model_obj, attr)):
+                        setattr(model_obj, attr, value)
+                        update_obj[attr] = value
+                model_obj.save()
+                updated.append(model_obj)
+                ccall_log.debug('Updated Prospect object %s: %s',
+                                natural_value, update_obj)
+            except ObjectDoesNotExist:
+                # create new prospect
                 try:
-                    model_obj = self.get_by_natural_key(natural_value)
-                    # update obj
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != str(getattr(model_obj, attr)):
-                            setattr(model_obj, attr, value)
-                            update_obj[attr] = value
-                    model_obj.save()
-                    ccall_log.debug('Updated Prospect object %s: %s',
-                                    natural_value, update_obj)
-                except ObjectDoesNotExist:
-                    # create new obj
-                    model_obj = self.create(**obj)
+                    with transaction.atomic():
+                        model_obj = self.create(**obj)
+                    created.append(model_obj)
                     ccall_log.debug('Created Prospect object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Prospect object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered on Prospect object: %s', obj)
+        return created, updated
 
 
 class Prospect(models.Model):
@@ -155,6 +168,9 @@ class Prospect(models.Model):
     def __str__(self):
         return '{} ({})'.format(self.name, self.nric)
 
+    def natural_key(self):
+        return self.nric
+
 
 class FundManager(models.Manager):
     """Custom manager for model Fund."""
@@ -167,25 +183,28 @@ class FundManager(models.Manager):
         for obj in data:
             try:
                 natural_value = obj['name']
+                model_obj = self.get_by_natural_key(natural_value)
+                # update obj
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != str(getattr(model_obj, attr)):
+                        setattr(model_obj, attr, value)
+                        update_obj[attr] = value
+                model_obj.save()
+                ccall_log.debug('Updated Fund object %s: %s',
+                                natural_value, update_obj)
+            except ObjectDoesNotExist:
+                # create new obj
                 try:
-                    model_obj = self.get_by_natural_key(natural_value)
-                    # update obj
-                    update_obj = {}
-                    for attr, value in obj.items():
-                        if value != str(getattr(model_obj, attr)):
-                            setattr(model_obj, attr, value)
-                            update_obj[attr] = value
-                    model_obj.save()
-                    ccall_log.debug('Updated Fund object %s: %s',
-                                    natural_value, update_obj)
-                except ObjectDoesNotExist:
-                    # create new obj
-                    model_obj = self.create(**obj)
+                    with transaction.atomic():
+                        model_obj = self.create(**obj)
                     ccall_log.debug('Created Fund object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Fund object: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encoutered during processing: %s', obj)
+                    'Exception encountered on Fund object: %s', obj)
 
 
 class Fund(models.Model):
@@ -196,6 +215,9 @@ class Fund(models.Model):
                             max_length=50, unique=True)
 
     def __str__(self):
+        return self.name
+
+    def natural_key(self):
         return self.name
 
 
@@ -213,18 +235,24 @@ class PledgeManager(models.Manager):
                     obj['pledge_fund'])
                 obj['pledge_date'] = datetime.strptime(
                     obj['pledge_date'], r'%d/%m/%Y')
-                self.create(**obj)
-                ccall_log.debug('Created Pledge object: %s', obj)
-            except ObjectDoesNotExist:
-                # no prospect/ no fund
+                try:
+                    with transaction.atomic():
+                        self.create(**obj)
+                    ccall_log.debug('Created Pledge object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Pledge object: %s', obj)
+            except Prospect.DoesNotExist:
+                # no prospect
                 ccall_log.error(
-                    'Cannot create Pledge object, no Prospect/Fund: %s', obj)
-                continue
+                    'Cannot create Pledge object, no Prospect: %s', obj)
+            except Fund.DoesNotExist:
+                # no fund
+                ccall_log.error(
+                    'Cannot create Pledge object, no Fund: %s', obj)
             except BaseException as exc_:
                 ccall_log.exception(exc_)
                 ccall_log.error(
-                    'Exception encountered during processing: %s', obj)
-                continue
+                    'Exception encountered on Pledge object: %s', obj)
 
 
 class Pledge(models.Model):
@@ -252,19 +280,54 @@ class Project(models.Model):
         return self.name
 
 
+class PoolManager(models.Manager):
+    """Custom manager for model Pool."""
+
+    def get_by_natural_key(self, project, name):
+        return self.get(project=project, name=name)
+
+    def from_upload(self, project, name, data):
+        """Process data from Pool upload."""
+        try:
+            # get the pool by natural key
+            pool_obj = self.get_by_natural_key(project, name)
+            created, updated = Prospect.objects.from_upload(data)
+            pool_obj.prospects.add(*(created + updated))
+            ccall_log.debug('Updated Pool object %s', name)
+        except Pool.DoesNotExist:
+            # create the pool
+            pool_obj = self.create(project=project, name=name)
+            created, updated = Prospect.objects.from_upload(data)
+            pool_obj.prospects.add(*(created + updated))
+            ccall_log.debug('Created Pool object %s', name)
+        except BaseException as exc_:
+            ccall_log.exception(exc_)
+            ccall_log.error(
+                'Exception encountered on Pool object: %s', name)
+
+
 class Pool(models.Model):
     """Model for a Pool."""
+    objects = PoolManager()
+
     name = models.CharField(max_length=50, verbose_name='Pool name')
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, verbose_name='Project')
     max_attempts = models.PositiveSmallIntegerField(
-        verbose_name='Maximum number of attempts')
+        verbose_name='Maximum number of attempts', default=0)
     prospects = models.ManyToManyField(
         to=Prospect, related_name='prospect_set',
         related_query_name='prospects', verbose_name='Prospects', blank=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_active(self):
+        return bool(self.max_attempts)
+
+    def natural_key(self):
+        return (self.project, self.name,)
 
 
 class ResultCode(models.Model):

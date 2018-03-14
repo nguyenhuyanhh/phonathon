@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^logout/$', ccall_views.LogoutView.as_view(), name='logout'),
     url(r'^ccall/$', ccall_views.home, name='ccall'),
     url(r'^admin/upload/$', ccall_views.upload, name='upload'),
+    url(r'^admin/upload_pool/$', ccall_views.upload_pool, name='upload_pool'),
     url(r'^admin/', admin.site.urls),
     url(r'^$', RedirectView.as_view(url='ccall')),
 ]

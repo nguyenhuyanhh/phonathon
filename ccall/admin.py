@@ -11,6 +11,7 @@ from .models import (Call, Fund, PhonathonUser, Pledge, Pool, Project,
                      Prospect, ResultCode)
 
 
+@admin.register(PhonathonUser)
 class PhonathonUserAdmin(UserAdmin):
     """Admin interface for model User."""
     list_display = ('username', 'name', 'email', 'is_staff', 'is_active')
@@ -37,6 +38,7 @@ class PhonathonUserAdmin(UserAdmin):
         return fieldsets
 
 
+@admin.register(Prospect)
 class ProspectAdmin(admin.ModelAdmin):
     """Admin interface for model Prospect."""
     list_display = ('nric', 'name', 'phone_home', 'phone_mobile')
@@ -51,15 +53,41 @@ class ProspectAdmin(admin.ModelAdmin):
     add_fieldsets = fieldsets
 
 
-# Register models
-admin.site.register(PhonathonUser, PhonathonUserAdmin)
-admin.site.register(Prospect, ProspectAdmin)
-admin.site.register(Pledge)
-admin.site.register(Fund)
-admin.site.register(Project)
-admin.site.register(Pool)
-admin.site.register(ResultCode)
-admin.site.register(Call)
+@admin.register(Pledge)
+class PledgeAdmin(admin.ModelAdmin):
+    """Admin interface for model Pledge."""
+    list_display = ('prospect', 'pledge_fund', 'pledge_amount', 'pledge_date')
+
+
+@admin.register(Fund)
+class FundAdmin(admin.ModelAdmin):
+    """Admin interface for model Fund."""
+    pass
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    """Admin interface for model Project."""
+    pass
+
+
+@admin.register(Pool)
+class PoolAdmin(admin.ModelAdmin):
+    """Admin interface for model Pool."""
+    pass
+
+
+@admin.register(ResultCode)
+class ResultCodeAdmin(admin.ModelAdmin):
+    """Admin interface for model ResultCode."""
+    pass
+
+
+@admin.register(Call)
+class CallAdmin(admin.ModelAdmin):
+    """Admin interface for model Call."""
+    pass
+
 
 # Unregister groups, since groups are automatically populated
 admin.site.unregister(Group)
