@@ -11,7 +11,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm, UploadPoolForm
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
+from .models.fund import Fund
+from .models.pledge import Pledge
+from .models.pool import Pool
+from .models.prospect import Prospect
+from .models.user import PhonathonUser
 
 ccall_log = logging.getLogger('ccall')
 
