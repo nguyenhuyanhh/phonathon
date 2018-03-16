@@ -6,7 +6,8 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import Group
 from django.test import TestCase
 
-from ..models import PhonathonUser, ResultCode
+from ..models.result_code import ResultCode
+from ..models.user import PhonathonUser
 
 
 class TestStaffStatus(TestCase):

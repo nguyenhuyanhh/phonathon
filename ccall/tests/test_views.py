@@ -10,7 +10,12 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..models import Fund, PhonathonUser, Pledge, Pool, Project, Prospect
+from ..models.fund import Fund
+from ..models.pledge import Pledge
+from ..models.pool import Pool
+from ..models.project import Project
+from ..models.prospect import Prospect
+from ..models.user import PhonathonUser
 from ..views import LoginView, LogoutView, home, upload, upload_pool
 
 
