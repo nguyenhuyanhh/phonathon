@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import logging
 
+from django.core.validators import MinValueValidator
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import IntegrityError, models, transaction
 from django.utils import timezone
@@ -74,3 +75,13 @@ class PhonathonUser(AbstractUser):
     def is_manager_and_above(self):
         """Check whether an user is a Manager or above."""
         return self.is_superuser or self.groups.filter(name='Managers').count()
+
+
+class Assignment(models.Model):
+    """
+    Model for Pool assignments to PhonathonUser.
+    Through model for many-to-many relationship on Pool.
+    """
+    user = models.ForeignKey(PhonathonUser, on_delete=models.CASCADE)
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
