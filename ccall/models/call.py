@@ -29,6 +29,8 @@ class Call(models.Model):
         Prospect, verbose_name='Prospect', on_delete=models.CASCADE)
     pool = models.ForeignKey(Pool, verbose_name='Pool',
                              on_delete=models.SET_NULL, null=True)
+    attempt = models.PositiveSmallIntegerField(
+        verbose_name='Attempt', validators=[MinValueValidator(1)])
     result_code = models.ForeignKey(
         ResultCode, verbose_name='Result code', on_delete=models.CASCADE)
     comment = models.TextField(verbose_name='Comments', blank=True)
@@ -42,3 +44,6 @@ class Call(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.prospect, self.caller)
+
+    def natural_key(self):
+        return (self.caller, self.prospect, self.pool, self.attempt,)
