@@ -1,19 +1,80 @@
 # -*- coding: utf-8 -*-"""
-"""Models for a Call."""
+"""Model for a Call."""
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models, transaction
 
 from ..models.pool import Pool
 from ..models.prospect import Prospect
 from ..models.result_code import ResultCode
 from ..models.user import PhonathonUser
 
+ccall_log = logging.getLogger('ccall')
+
+
+class CallManager(models.Manager):
+    """Custom manager for model Call."""
+
+    def get_by_natural_key(self, caller, prospect, pool, attempt):
+        return self.get(caller=caller,
+                        prospect=prospect,
+                        pool=pool,
+                        attempt=attempt)
+
+    def from_upload(self, data):
+        """Process data from Call upload."""
+        for obj in data:
+            try:
+                # get caller, prospect, pool by natural key
+                obj['caller'] = PhonathonUser.objects.get_by_natural_key(
+                    obj['caller'])
+                obj['prospect'] = Prospect.objects.get_by_natural_key(
+                    obj['prospect'])
+                args = (obj['caller'], obj['prospect'],
+                        obj['pool'], obj['attempt'])
+                call_obj = self.get_by_natural_key(*args)
+                # update Call
+                update_obj = {}
+                for attr, value in obj.items():
+                    if value != getattr(call_obj, attr):
+                        setattr(call_obj, attr, value)
+                        update_obj[attr] = value
+                ccall_log('Updated Call object %s: %s',
+                          str(call_obj), update_obj)
+            except PhonathonUser.DoesNotExist:
+                # no caller
+                ccall_log.error(
+                    'Cannot create Call object, no PhonathonUser: %s', obj)
+            except Prospect.DoesNotExist:
+                # no prospect
+                ccall_log.error(
+                    'Cannot create Call object, no Prospect: %s', obj)
+            except Pool.DoesNotExist:
+                # no pool
+                ccall_log.error(
+                    'Cannot create Call object, no Pool: %s', obj)
+            except Call.DoesNotExist:
+                # create Call
+                try:
+                    with transaction.atomic():
+                        self.create(**obj)
+                    ccall_log.debug('Created Call object: %s', obj)
+                except IntegrityError:
+                    ccall_log.error('Cannot create Call object: %s', obj)
+            except BaseException as exc_:
+                ccall_log.exception(exc_)
+                ccall_log.error(
+                    'Exception encountered on Call object: %s', obj)
+
 
 class Call(models.Model):
     """Model for a Call."""
+    objects = CallManager()
+
     METHOD_CHECK = 'Check'
     METHOD_CREDIT = 'Credit'
     METHOD_EFT = 'EFT'
