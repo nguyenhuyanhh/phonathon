@@ -52,6 +52,9 @@ class Pool(models.Model):
         to=Prospect, related_name='prospect_set',
         related_query_name='prospects', verbose_name='Prospects', blank=True)
 
+    class Meta:
+        unique_together = ('name', 'project',)
+
     def __str__(self):
         return self.name
 
