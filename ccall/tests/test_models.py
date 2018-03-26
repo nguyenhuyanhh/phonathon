@@ -3,8 +3,6 @@
 
 from __future__ import unicode_literals
 
-import unittest
-
 from django.contrib.auth.models import Group
 from django.test import TestCase
 

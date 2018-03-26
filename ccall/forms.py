@@ -9,16 +9,18 @@ from .models.pool import Pool
 
 
 class UploadForm(forms.Form):
-    """Form to handle Caller/Fund/Prospect/Pledge CSV data uploads."""
+    """Form to handle Caller/Fund/Prospect/Pledge/Call CSV data uploads."""
     MODEL_USER = 'Caller'
     MODEL_FUND = 'Fund'
     MODEL_PROSPECT = 'Prospect'
     MODEL_PLEDGE = 'Pledge'
+    MODEL_CALL = 'Call'
     MODELS = (
         (MODEL_USER, MODEL_USER),
         (MODEL_FUND, MODEL_FUND),
         (MODEL_PROSPECT, MODEL_PROSPECT),
         (MODEL_PLEDGE, MODEL_PLEDGE),
+        (MODEL_CALL, MODEL_CALL),
     )
     model = forms.ChoiceField(label='Data type', choices=MODELS)
     uploaded_file = forms.FileField(
