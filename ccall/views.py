@@ -11,7 +11,12 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, resolve_url
 
 from .forms import UploadForm, UploadPoolForm
-from .models import Fund, PhonathonUser, Pledge, Pool, Prospect
+from .models.call import Call
+from .models.fund import Fund
+from .models.pledge import Pledge
+from .models.pool import Pool
+from .models.prospect import Prospect
+from .models.user import PhonathonUser
 
 ccall_log = logging.getLogger('ccall')
 
@@ -23,6 +28,7 @@ def upload_data(data, model_string):
         UploadForm.MODEL_FUND: Fund,
         UploadForm.MODEL_PROSPECT: Prospect,
         UploadForm.MODEL_PLEDGE: Pledge,
+        UploadForm.MODEL_CALL: Call,
     }
     try:
         lookup[model_string].objects.from_upload(data)
@@ -53,7 +59,8 @@ def upload(request):
     if request.method == 'GET':
         return render(request, 'admin/upload.html',
                       {'form': UploadForm,
-                       'title': 'Upload Caller/Fund/Prospect/Pledge data'})
+                       'title': 'Upload Caller/Fund/' +
+                                'Prospect/Pledge/Call data'})
     # else process the form
     try:
         form = UploadForm(request.POST, request.FILES)
@@ -70,7 +77,8 @@ def upload(request):
         else:
             return render(request, 'admin/upload.html',
                           {'form': UploadForm,
-                           'title': 'Upload Caller/Fund/Prospect/Pledge data'})
+                           'title': 'Upload Caller/Fund/' +
+                                    'Prospect/Pledge/Call data'})
     except BaseException as exc:
         print(exc)
 

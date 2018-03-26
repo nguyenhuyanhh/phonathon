@@ -10,7 +10,13 @@ from django.test import TestCase
 from django.urls import resolve
 from django.views.generic.base import RedirectView
 
-from ..models import Fund, PhonathonUser, Pledge, Pool, Project, Prospect
+from ..models.call import Call
+from ..models.fund import Fund
+from ..models.pledge import Pledge
+from ..models.pool import Pool
+from ..models.project import Project
+from ..models.prospect import Prospect
+from ..models.user import PhonathonUser
 from ..views import LoginView, LogoutView, home, upload, upload_pool
 
 
@@ -165,3 +171,15 @@ class TestUploadView(TestCase):
         self.assertTrue(Pool.objects.get(name='Test Pool'))
         self.assertEqual(Pool.objects.get(
             name='Test Pool').prospects.count(), 1)
+
+    def test_upload_call(self):
+        """Test upload a call CSV file."""
+        self.test_upload_pool()
+        data_file = os.path.join(self.data_dir, 'test_call.csv')
+        with open(data_file, 'r') as csv_:
+            response = self.client.post('/admin/upload/',
+                                        {'model': 'Call',
+                                         'uploaded_file': csv_},
+                                        follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Call.objects.get(prospect__nric='S1234567A'))

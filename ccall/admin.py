@@ -7,8 +7,14 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 
-from .models import (Call, Fund, PhonathonUser, Pledge, Pool, Project,
-                     Prospect, ResultCode)
+from .models.call import Call
+from .models.fund import Fund
+from .models.pledge import Pledge
+from .models.pool import Pool
+from .models.project import Project
+from .models.prospect import Prospect
+from .models.result_code import ResultCode
+from .models.user import PhonathonUser
 
 
 @admin.register(PhonathonUser)
