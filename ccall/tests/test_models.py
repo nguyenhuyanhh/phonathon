@@ -248,8 +248,7 @@ class TestFund(TestCase):
 class TestPledge(TestCase):
     """Test cases for Pledge."""
 
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         prospect_obj = {
             'nric': 'S1234567A',
             'salutation': 'Ms',
@@ -261,19 +260,19 @@ class TestPledge(TestCase):
         }
         Prospect.objects.create(**prospect_obj)
         Fund.objects.create(name='NTU Bursaries')
-        cls.pledge_obj_add_1 = {
+        self.pledge_obj_add_1 = {
             'prospect': 'S1234567A',
             'pledge_amount': '50',
             'pledge_fund': 'NTU Bursaries',
             'pledge_date': '01/03/2017'
         }
-        cls.pledge_obj_add_2 = {
+        self.pledge_obj_add_2 = {
             'prospect': 'S1234567A',
             'pledge_amount': '100',
             'pledge_fund': 'NTU Bursaries',
             'pledge_date': '01/03/2016'
         }
-        cls.pledge_obj_err = {
+        self.pledge_obj_err = {
             'prospect': 'S1234567A',
             'pledge_amount': '100',
             'pledge_fund': 'NTU Bursaries',
@@ -284,14 +283,12 @@ class TestPledge(TestCase):
         Pledge.objects.from_upload([self.pledge_obj_add_1])
         self.assertEqual(Pledge.objects.count(), 1)
 
-    @unittest.expectedFailure
     def test_from_upload_multiple_pledge(self):
         """Test adding multiple Pledges via custom manager."""
         Pledge.objects.from_upload(
             [self.pledge_obj_add_1, self.pledge_obj_add_2])
         self.assertEqual(Pledge.objects.count(), 2)
 
-    @unittest.expectedFailure
     def test_from_upload_multiple_pledge_error(self):
         """Test adding multiple Pledges, with errors."""
         Pledge.objects.from_upload(
