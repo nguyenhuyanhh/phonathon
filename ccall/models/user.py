@@ -82,6 +82,9 @@ class Assignment(models.Model):
     Model for Pool assignments to PhonathonUser.
     Through model for many-to-many relationship on Pool.
     """
-    user = models.ForeignKey(PhonathonUser, on_delete=models.CASCADE)
+    caller = models.ForeignKey(PhonathonUser, on_delete=models.CASCADE)
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+
+    def __str__(self):
+        return '{}: ({}) {}'.format(self.caller, self.order, self.pool)

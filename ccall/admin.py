@@ -14,7 +14,7 @@ from .models.pool import Pool
 from .models.project import Project
 from .models.prospect import Prospect
 from .models.result_code import ResultCode
-from .models.user import PhonathonUser
+from .models.user import Assignment, PhonathonUser
 
 
 @admin.register(PhonathonUser)
@@ -93,6 +93,12 @@ class ResultCodeAdmin(admin.ModelAdmin):
 class CallAdmin(admin.ModelAdmin):
     """Admin interface for model Call."""
     pass
+
+
+@admin.register(Assignment)
+class AssignmentAdmin(admin.ModelAdmin):
+    """Admin interface for model Assignment."""
+    list_display = ('caller', 'pool', 'order',)
 
 
 # Unregister groups, since groups are automatically populated

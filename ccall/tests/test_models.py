@@ -13,7 +13,7 @@ from ..models.pool import Pool
 from ..models.project import Project
 from ..models.prospect import Prospect
 from ..models.result_code import ResultCode
-from ..models.user import PhonathonUser
+from ..models.user import Assignment, PhonathonUser
 
 
 class TestStrings(TestCase):
@@ -66,6 +66,12 @@ class TestStrings(TestCase):
         test_call = Call(caller=self.test_user, prospect=self.test_prospect)
         self.assertEqual(
             str(test_call), 'Alex Ang (S1234567A) - Alex Ang (AlexA)')
+
+    def test_string_assignment(self):
+        """Test the string representation for Assignment."""
+        test_assignment = Assignment(
+            caller=self.test_user, pool=self.test_pool, order=1)
+        self.assertEqual(str(test_assignment), 'Alex Ang (AlexA): (1) AQ2017')
 
 
 class TestPhonathonUser(TestCase):
