@@ -55,6 +55,7 @@ The following URLs are applicable to the project:
 | `/ccall` | Main calling interface
 | `/admin` | Admin interface (accessible only to supervisors, managers and superusers)
 | `/admin/upload` | Upload data (accessible only to managers and superusers)
+| `/admin/upload_pool` | Upload pool data (accessible only to managers and superusers)
 | `/login` | Login
 | `/logout` | Logout, redirects back to login
 
