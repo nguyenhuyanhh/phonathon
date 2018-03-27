@@ -77,11 +77,20 @@ class PhonathonUser(AbstractUser):
         return self.is_superuser or self.groups.filter(name='Managers').count()
 
 
+class AssignmentManager(models.Manager):
+    """Custom manager for Assignment."""
+
+    def get_current_pool(self, caller):
+        return self.filter(caller=caller).order_by('order')[0].pool
+
+
 class Assignment(models.Model):
     """
     Model for Pool assignments to PhonathonUser.
     Through model for many-to-many relationship on Pool.
     """
+    objects = AssignmentManager()
+
     caller = models.ForeignKey(PhonathonUser, on_delete=models.CASCADE)
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])

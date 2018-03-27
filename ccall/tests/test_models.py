@@ -452,3 +452,37 @@ class TestCall(TestCase):
         self.assertEqual(Call.objects.count(), 2)
         self.assertEqual(len(created), 1)
         self.assertEqual(len(updated), 0)
+
+
+class TestAssignment(TestCase):
+    """Test cases for Assignment."""
+
+    def setUp(self):
+        self.caller_obj = PhonathonUser.objects.create_user(
+            'test', password='test')
+        self.project_obj = Project.objects.create(name='Project')
+        # create 5 pools
+        for i in range(1, 6):
+            setattr(self, 'pool_obj_{}'.format(i),
+                    Pool.objects.create(name='Pool {}'.format(i),
+                                        project=self.project_obj))
+
+    def test_get_current_pool(self):
+        """Test get_current_pool() function."""
+        for i in range(1, 6):
+            Assignment.objects.create(caller=self.caller_obj,
+                                      pool=getattr(self,
+                                                   'pool_obj_{}'.format(i)),
+                                      order=i)
+        self.assertEqual(Assignment.objects.get_current_pool(
+            self.caller_obj), self.pool_obj_1)
+
+    def test_get_current_pool_order_not_1(self):
+        """Test get_current_pool() when orders do not start from 1."""
+        for i in range(1, 6):
+            Assignment.objects.create(caller=self.caller_obj,
+                                      pool=getattr(self,
+                                                   'pool_obj_{}'.format(i)),
+                                      order=i + 2)
+        self.assertEqual(Assignment.objects.get_current_pool(
+            self.caller_obj), self.pool_obj_1)
