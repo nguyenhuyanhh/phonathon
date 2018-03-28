@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from ..models.project import Project
@@ -78,8 +77,7 @@ class PoolProspects(models.Model):
     """
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
-    attempts = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)])
+    attempts = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
         return '{} ({})'.format(self.prospect, self.pool)
