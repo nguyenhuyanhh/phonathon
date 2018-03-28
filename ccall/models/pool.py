@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import logging
 
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from ..models.project import Project
@@ -49,8 +50,8 @@ class Pool(models.Model):
     max_attempts = models.PositiveSmallIntegerField(
         verbose_name='Maximum number of attempts', default=0)
     prospects = models.ManyToManyField(
-        to=Prospect, related_name='prospect_set',
-        related_query_name='prospects', verbose_name='Prospects', blank=True)
+        to=Prospect, through='PoolProspects',
+        verbose_name='Prospects', blank=True)
 
     class Meta:
         unique_together = ('name', 'project',)
@@ -67,4 +68,18 @@ class Pool(models.Model):
     prospect_count.short_description = 'Number of prospects'
 
     def natural_key(self):
-        return (self.project, self.name,)
+        return(self.project, self.name,)
+
+
+class PoolProspects(models.Model):
+    """
+    Model for Prospects in Pool.
+    Through model for many-to-many relationship on Pool.
+    """
+    prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
+    pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
+    attempts = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1)])
+
+    def __str__(self):
+        return '{} ({})'.format(self.prospect, self.pool)
