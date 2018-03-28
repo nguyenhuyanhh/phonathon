@@ -23,10 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fdtpl_np4%#-!icjq=ha2(3@f-*!*powyfq=^su)xj&0o(e*j('
+SECRET_KEY = os.getenv('SECRET_KEY', 'secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', True)
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -115,7 +115,7 @@ STATIC_URL = '/static/'
 
 LOGGING_CONFIG = None
 
-LOGLEVEL = 'DEBUG'
+LOGLEVEL = os.getenv('LOGLEVEL', 'DEBUG')
 
 logging.config.dictConfig(
     {

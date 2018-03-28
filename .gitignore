@@ -7,3 +7,6 @@ __pycache__/
 
 # Dev database
 *.sqlite*
+
+# Environment variables
+.env
