@@ -80,7 +80,7 @@ class ProjectAdmin(admin.ModelAdmin):
 @admin.register(Pool)
 class PoolAdmin(admin.ModelAdmin):
     """Admin interface for model Pool."""
-    pass
+    list_display = ('name', 'project', 'max_attempts', 'prospect_count')
 
 
 @admin.register(ResultCode)

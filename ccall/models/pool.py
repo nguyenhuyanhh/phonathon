@@ -62,5 +62,9 @@ class Pool(models.Model):
     def is_active(self):
         return bool(self.max_attempts)
 
+    def prospect_count(self):
+        return self.prospects.count()
+    prospect_count.short_description = 'Number of prospects'
+
     def natural_key(self):
         return (self.project, self.name,)
