@@ -25,13 +25,15 @@ class PoolManager(models.Manager):
             # get the pool by natural key
             pool_obj = self.get_by_natural_key(project, name)
             created, updated = Prospect.objects.from_upload(data)
-            pool_obj.prospects.add(*(created + updated))
+            PoolProspects.objects.from_upload(
+                pool_obj, created + updated)
             ccall_log.debug('Updated Pool object %s', name)
         except Pool.DoesNotExist:
             # create the pool
             pool_obj = self.create(project=project, name=name)
             created, updated = Prospect.objects.from_upload(data)
-            pool_obj.prospects.add(*(created + updated))
+            PoolProspects.objects.from_upload(
+                pool_obj, created + updated)
             ccall_log.debug('Created Pool object %s', name)
         except BaseException as exc_:
             ccall_log.exception(exc_)
@@ -70,14 +72,39 @@ class Pool(models.Model):
         return(self.project, self.name,)
 
 
+class PoolProspectsManager(models.Manager):
+    """Custom manager for PoolProspects."""
+
+    def get_by_natural_key(self, pool, prospect):
+        return self.get(pool=pool, prospect=prospect)
+
+    def from_upload(self, pool, prospect_list):
+        """Process data from Pool upload."""
+        created = []
+        for prospect in prospect_list:
+            try:
+                # get PoolProspect object
+                poolpros_obj = self.get_by_natural_key(pool, prospect)
+            except PoolProspects.DoesNotExist:
+                # create new object
+                poolpros_obj = self.create(pool=pool, prospect=prospect)
+                created.append(poolpros_obj)
+        return created
+
+
 class PoolProspects(models.Model):
     """
     Model for Prospects in Pool.
     Through model for many-to-many relationship on Pool.
     """
+    objects = PoolProspectsManager()
+
     prospect = models.ForeignKey(Prospect, on_delete=models.CASCADE)
     pool = models.ForeignKey(Pool, on_delete=models.CASCADE)
     attempts = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
         return '{} ({})'.format(self.prospect, self.pool)
+
+    def natural_key(self):
+        return (self.pool, self.prospect,)

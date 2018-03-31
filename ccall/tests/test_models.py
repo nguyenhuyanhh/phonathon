@@ -9,7 +9,7 @@ from django.test import TestCase
 from ..models.call import Call
 from ..models.fund import Fund
 from ..models.pledge import Pledge
-from ..models.pool import Pool
+from ..models.pool import Pool, PoolProspects
 from ..models.project import Project
 from ..models.prospect import Prospect
 from ..models.result_code import ResultCode
@@ -326,8 +326,9 @@ class TestPool(TestCase):
         cls.project = Project.objects.create(name='Test Project')
         cls.test_pool = Pool.objects.create(
             name='Test Pool', project=cls.project)
-        cls.test_pool.prospects.add(
-            Prospect.objects.create(**cls.prospect_obj_1))
+        PoolProspects.objects.create(
+            pool=cls.test_pool,
+            prospect=Prospect.objects.create(**cls.prospect_obj_1))
 
     def test_is_active(self):
         """Test the attribute is_active."""
