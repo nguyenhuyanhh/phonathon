@@ -92,22 +92,6 @@ class CallManager(models.Manager):
                     'Exception encountered on Call object: %s', obj)
         return created, updated
 
-    def check_prospect_complete(self, pool, prospect):
-        """Check whether a prospect has been completed for the Pool."""
-        return self.filter(pool=pool,
-                           prospect=prospect,
-                           result_code__is_complete=True).exists()
-
-    def get_current_attempt(self, pool, prospect):
-        """Get the current attempt of a prospect in a Pool."""
-        try:
-            return self.filter(pool=pool,
-                               prospect=prospect
-                               ).order_by('-attempt').first().attempt + 1
-        except AttributeError:
-            # no call made yet
-            return 1
-
 
 class Call(models.Model):
     """Model for a Call."""

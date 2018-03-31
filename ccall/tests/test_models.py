@@ -457,37 +457,6 @@ class TestCall(TestCase):
         self.assertEqual(len(created), 1)
         self.assertEqual(len(updated), 0)
 
-    def test_check_prospect_complete_false(self):
-        """Test check_prospect_complete() returning False."""
-        self.assertEqual(Call.objects.check_prospect_complete(
-            self.pool_obj, self.prospect_obj), False)
-
-    def test_check_prospect_complete_true(self):
-        """Test check_prospect_complete() returning True."""
-        _, _ = Call.objects.from_upload([self.call_obj_upd])
-        self.assertEqual(Call.objects.check_prospect_complete(
-            self.pool_obj, self.prospect_obj), True)
-
-    def test_get_current_attempt(self):
-        """Test get_current_attempt()."""
-        self.assertEqual(Call.objects.get_current_attempt(
-            self.pool_obj, self.prospect_obj), 2)
-
-    def test_get_current_attempt_new_prospect(self):
-        """Test get_current_attempt() for new prospect."""
-        prospect_obj = {
-            'nric': 'S1234567B',
-            'salutation': 'Ms',
-            'name': 'Anna Low',
-            'gender': 'F',
-            'education_school': 'School of Humanities',
-            'education_degree': 'B.A (Econs)',
-            'education_year': '2017'
-        }
-        prospect_obj = Prospect.objects.create(** prospect_obj)
-        self.assertEqual(Call.objects.get_current_attempt(
-            self.pool_obj, prospect_obj), 1)
-
 
 class TestAssignment(TestCase):
     """Test cases for Assignment."""
