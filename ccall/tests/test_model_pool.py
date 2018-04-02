@@ -51,13 +51,17 @@ class TestPool(TestCase):
         self.test_pool.save()
         self.assertTrue(self.test_pool.is_active)
 
+    def test_prospect_count(self):
+        """Test the method prospect_count()."""
+        self.assertEqual(self.test_pool.prospect_count(), 1)
+
     def test_from_upload_add_pool(self):
         """Test adding pool via custom manager."""
         Pool.objects.from_upload(
             self.project, 'Test Pool 1', [self.prospect_obj_1])
         self.assertEqual(Pool.objects.count(), 2)
         test_pool = Pool.objects.get(name='Test Pool 1')
-        self.assertEqual(test_pool.prospects.count(), 1)
+        self.assertEqual(test_pool.prospect_count(), 1)
 
     def test_from_upload_update_pool(self):
         """Test updating pool via custom manager."""
@@ -65,7 +69,7 @@ class TestPool(TestCase):
             self.project, 'Test Pool', [self.prospect_obj_2])
         self.assertEqual(Pool.objects.count(), 1)
         test_pool = Pool.objects.get(name='Test Pool')
-        self.assertEqual(test_pool.prospects.count(), 2)
+        self.assertEqual(test_pool.prospect_count(), 2)
 
     def test_from_upload_update_pool_multiple_prospects(self):
         """Test updating pool with multiple prospects."""
@@ -74,7 +78,7 @@ class TestPool(TestCase):
             [self.prospect_obj_1, self.prospect_obj_2])
         self.assertEqual(Pool.objects.count(), 1)
         test_pool = Pool.objects.get(name='Test Pool')
-        self.assertEqual(test_pool.prospects.count(), 2)
+        self.assertEqual(test_pool.prospect_count(), 2)
 
     def test_from_upload_invalid_pool(self):
         """Test adding invalid pool via custom manager."""
