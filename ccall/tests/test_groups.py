@@ -40,6 +40,22 @@ class TestGroups(TestCase):
         self.assertNotIn(change, self.caller_perms)
         self.assertNotIn(delete, self.caller_perms)
 
+    def test_permissions_assignment(self):
+        """Tests for Assignment permission."""
+        add = Permission.objects.get(codename='add_assignment')
+        change = Permission.objects.get(codename='change_assignment')
+        delete = Permission.objects.get(codename='delete_assignment')
+
+        self.assertIn(add, self.manager_perms)
+        self.assertIn(change, self.manager_perms)
+        self.assertIn(delete, self.manager_perms)
+        self.assertIn(add, self.supervisor_perms)
+        self.assertIn(change, self.supervisor_perms)
+        self.assertIn(delete, self.supervisor_perms)
+        self.assertNotIn(add, self.caller_perms)
+        self.assertNotIn(change, self.caller_perms)
+        self.assertNotIn(delete, self.caller_perms)
+
     def test_permissions_prospect(self):
         """Tests for Prospect permission."""
         add = Permission.objects.get(codename='add_prospect')

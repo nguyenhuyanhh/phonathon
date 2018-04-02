@@ -37,6 +37,14 @@ def add_groups(apps, schema_editor):
     # only manager can add or delete
     managers.permissions.add(add, delete)
 
+    # apply permissions for Assignment
+    add = Permission.objects.get(codename='add_assignment')
+    change = Permission.objects.get(codename='change_assignment')
+    delete = Permission.objects.get(codename='delete_assignment')
+    # only managers and supervisors can do this
+    managers.permissions.add(add, change, delete)
+    supervisors.permissions.add(add, change, delete)
+
     # apply permissions for Prospect
     add = Permission.objects.get(codename='add_prospect')
     change = Permission.objects.get(codename='change_prospect')
